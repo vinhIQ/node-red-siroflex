@@ -1,0 +1,12 @@
+{
+    "name": "node-red-Siroflex",
+    "description": "This project includes Node Red DataLogging and ORCRackID Project",
+    "version": "0.0.1",
+    "dependencies": {},
+    "node-red": {
+        "settings": {
+            "flowFile": "flows.json",
+            "credentialsFile": "flows_cred.json"
+        }
+    }
+}
