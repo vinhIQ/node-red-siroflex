@@ -22,6 +22,20 @@
         "info": "Polls AGV_Current[1..5] every 100ms. The function node compares each poll against the previous snapshot in flow.context. If ANY field differs, a full 62-field snapshot is inserted into MySQL — including fields that didn't change within that snapshot.\n\nFirst read per section is used to seed the baseline and produces no inserts. Strings are preserved exactly as read: trailing spaces and NULs are NOT stripped.\n\nNo PLC modification required."
     },
     {
+        "id": "e8106a54c29302b7",
+        "type": "tab",
+        "label": "PLC Logger",
+        "disabled": false,
+        "info": "PLC -> MySQL circular buffer logger.\n\nArchitecture:\n  - Two eth-ip in nodes push data on their own cycle (3s each):\n      LogUDT_1: control tags (indices, flags, counters)\n      LogUDT_2: buffer arrays (LogBuffer, SpillBuffer)\n  - Each is cached to flow context on arrival.\n  - A 5s timer reads both caches and processes them together.\n  - On successful MySQL INSERT, ReadIndex + SpillReadIndex written back."
+    },
+    {
+        "id": "d4a89cbeab1a35c8",
+        "type": "tab",
+        "label": "PLC Logger",
+        "disabled": false,
+        "info": "PLC -> MySQL circular buffer logger.\n\nArchitecture:\n  - Two eth-ip in nodes push data on their own cycle (3s each):\n      LogUDT_1: control tags (indices, flags, counters)\n      LogUDT_2: buffer arrays (LogBuffer, SpillBuffer)\n  - Each is cached to flow context on arrival.\n  - A 5s timer reads both caches and processes them together.\n  - NodeRedHeartbeat is written to PLC every 1s via separate path.\n  - On successful MySQL INSERT, ReadIndex + SpillReadIndex written back.\n\nRequired PLC tags (in addition to LogUDT setup):\n  - NodeRedHeartbeat (DINT) - written by NodeRed every 1s\n  - SpillReadIndex (DINT) - written by NodeRed after spill drain"
+    },
+    {
         "id": "310c0a8169ae4fac",
         "type": "group",
         "z": "2a81416e0ebc91b9",
@@ -158,7 +172,8 @@
             "d99264fc54fea286",
             "60f72b5ac3309fbf",
             "44c501f60a72c8b1",
-            "bf7c60f88b3928ac"
+            "bf7c60f88b3928ac",
+            "0e7cb3495d8521b3"
         ],
         "x": 34,
         "y": 39,
@@ -1054,6 +1069,10 @@
                     "mapping": ""
                 },
                 "IQ_LogBuffer_NR": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "IQ_LogBuffer": {
                     "type": "STRUCT",
                     "mapping": ""
                 }
@@ -2808,6 +2827,4080 @@
             "bgPage": "#4b5563",
             "groupBg": "#ffffff",
             "groupOutline": "#cccccc"
+        }
+    },
+    {
+        "id": "cfg_mysql",
+        "type": "MySQLdatabase",
+        "name": "PLC Logger DB",
+        "host": "127.0.0.1",
+        "port": "3306",
+        "db": "plc_logger",
+        "tz": "",
+        "charset": "UTF8"
+    },
+    {
+        "id": "a5d38873d5c95404",
+        "type": "eth-ip endpoint",
+        "address": "10.10.12.204",
+        "slot": "0",
+        "cycletime": "500ms",
+        "timeout": 10000,
+        "name": "LogUDT_1",
+        "connectedMess": true,
+        "vartable": {
+            "": {
+                "WriteIndex": {
+                    "type": "INT",
+                    "mapping": ""
+                },
+                "ReadIndex": {
+                    "type": "INT",
+                    "mapping": ""
+                },
+                "GlobalSeqID": {
+                    "type": "DINT",
+                    "mapping": ""
+                },
+                "SpillWriteIndex": {
+                    "type": "DINT",
+                    "mapping": ""
+                },
+                "PLCHeartBeat": {
+                    "type": "DINT",
+                    "mapping": ""
+                },
+                "BufferFull": {
+                    "type": "BOOL",
+                    "mapping": ""
+                },
+                "SpillFull": {
+                    "type": "BOOL",
+                    "mapping": ""
+                },
+                "DroppedRecordCount": {
+                    "type": "DINT",
+                    "mapping": ""
+                },
+                "NodeRedHeartBeat": {
+                    "type": "BOOL",
+                    "mapping": ""
+                }
+            }
+        }
+    },
+    {
+        "id": "1b55b1afbce46b8d",
+        "type": "eth-ip endpoint",
+        "address": "10.10.12.204",
+        "slot": "0",
+        "cycletime": 3000,
+        "timeout": 10000,
+        "name": "LogUDT_2",
+        "connectedMess": true,
+        "vartable": {
+            "": {
+                "LogBuffer[0]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[1]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[2]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[3]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[4]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[5]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[6]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[7]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[8]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[9]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[10]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[11]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[12]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[13]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[14]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[15]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[16]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[17]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[18]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[19]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[20]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[21]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[22]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[23]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[24]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[25]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[26]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[27]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[28]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[29]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[30]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[31]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[32]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[33]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[34]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[35]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[36]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[37]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[38]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[39]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[40]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[41]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[42]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[43]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[44]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[45]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[46]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[47]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[48]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[49]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[50]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[51]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[52]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[53]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[54]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[55]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[56]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[57]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[58]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[59]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[60]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[61]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[62]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[63]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[64]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[65]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[66]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[67]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[68]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[69]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[70]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[71]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[72]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[73]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[74]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[75]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[76]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[77]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[78]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[79]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[80]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[81]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[82]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[83]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[84]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[85]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[86]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[87]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[88]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[89]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[90]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[91]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[92]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[93]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[94]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[95]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[96]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[97]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[98]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[99]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[100]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[101]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[102]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[103]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[104]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[105]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[106]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[107]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[108]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[109]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[110]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[111]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[112]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[113]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[114]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[115]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[116]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[117]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[118]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[119]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[120]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[121]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[122]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[123]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[124]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[125]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[126]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[127]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[128]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[129]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[130]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[131]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[132]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[133]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[134]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[135]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[136]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[137]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[138]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[139]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[140]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[141]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[142]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[143]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[144]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[145]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[146]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[147]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[148]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[149]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[150]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[151]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[152]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[153]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[154]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[155]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[156]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[157]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[158]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[159]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[160]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[161]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[162]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[163]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[164]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[165]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[166]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[167]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[168]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[169]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[170]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[171]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[172]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[173]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[174]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[175]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[176]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[177]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[178]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[179]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[180]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[181]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[182]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[183]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[184]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[185]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[186]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[187]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[188]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[189]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[190]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[191]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[192]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[193]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[194]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[195]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[196]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[197]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[198]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[199]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[200]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[201]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[202]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[203]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[204]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[205]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[206]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[207]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[208]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[209]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[210]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[211]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[212]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[213]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[214]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[215]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[216]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[217]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[218]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[219]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[220]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[221]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[222]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[223]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[224]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[225]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[226]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[227]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[228]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[229]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[230]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[231]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[232]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[233]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[234]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[235]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[236]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[237]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[238]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[239]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[240]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[241]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[242]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[243]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[244]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[245]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[246]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[247]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[248]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[249]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[250]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[251]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[252]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[253]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[254]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[255]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[256]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[257]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[258]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[259]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[260]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[261]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[262]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[263]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[264]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[265]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[266]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[267]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[268]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[269]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[270]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[271]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[272]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[273]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[274]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[275]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[276]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[277]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[278]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[279]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[280]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[281]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[282]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[283]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[284]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[285]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[286]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[287]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[288]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[289]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[290]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[291]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[292]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[293]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[294]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[295]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[296]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[297]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[298]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[299]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[300]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[301]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[302]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[303]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[304]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[305]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[306]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[307]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[308]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[309]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[310]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[311]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[312]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[313]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[314]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[315]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[316]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[317]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[318]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[319]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[320]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[321]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[322]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[323]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[324]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[325]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[326]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[327]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[328]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[329]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[330]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[331]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[332]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[333]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[334]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[335]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[336]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[337]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[338]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[339]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[340]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[341]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[342]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[343]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[344]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[345]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[346]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[347]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[348]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[349]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[350]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[351]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[352]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[353]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[354]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[355]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[356]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[357]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[358]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[359]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[360]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[361]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[362]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[363]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[364]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[365]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[366]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[367]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[368]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[369]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[370]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[371]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[372]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[373]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[374]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[375]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[376]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[377]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[378]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[379]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[380]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[381]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[382]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[383]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[384]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[385]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[386]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[387]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[388]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[389]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[390]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[391]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[392]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[393]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[394]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[395]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[396]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[397]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[398]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[399]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[400]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[401]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[402]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[403]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[404]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[405]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[406]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[407]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[408]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[409]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[410]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[411]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[412]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[413]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[414]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[415]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[416]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[417]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[418]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[419]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[420]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[421]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[422]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[423]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[424]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[425]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[426]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[427]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[428]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[429]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[430]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[431]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[432]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[433]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[434]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[435]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[436]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[437]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[438]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[439]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[440]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[441]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[442]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[443]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[444]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[445]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[446]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[447]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[448]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[449]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[450]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[451]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[452]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[453]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[454]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[455]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[456]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[457]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[458]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[459]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[460]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[461]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[462]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[463]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[464]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[465]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[466]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[467]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[468]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[469]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[470]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[471]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[472]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[473]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[474]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[475]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[476]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[477]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[478]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[479]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[480]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[481]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[482]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[483]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[484]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[485]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[486]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[487]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[488]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[489]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[490]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[491]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[492]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[493]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[494]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[495]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[496]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[497]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[498]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[499]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[500]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[501]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[502]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[503]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[504]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[505]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[506]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[507]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[508]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[509]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[510]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[511]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[512]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[513]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[514]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[515]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[516]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[517]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[518]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[519]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[520]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[521]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[522]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[523]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[524]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[525]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[526]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[527]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[528]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[529]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[530]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[531]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[532]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[533]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[534]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[535]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[536]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[537]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[538]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[539]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[540]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[541]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[542]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[543]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[544]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[545]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[546]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[547]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[548]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[549]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[550]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[551]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[552]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[553]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[554]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[555]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[556]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[557]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[558]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[559]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[560]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[561]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[562]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[563]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[564]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[565]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[566]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[567]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[568]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[569]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[570]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[571]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[572]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[573]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[574]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[575]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[576]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[577]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[578]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[579]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[580]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[581]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[582]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[583]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[584]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[585]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[586]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[587]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[588]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[589]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[590]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[591]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[592]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[593]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[594]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[595]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[596]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[597]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[598]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[599]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[600]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[601]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[602]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[603]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[604]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[605]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[606]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[607]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[608]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[609]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[610]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[611]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[612]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[613]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[614]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[615]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[616]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[617]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[618]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[619]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[620]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[621]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[622]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[623]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[624]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[625]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[626]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[627]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[628]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[629]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[630]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[631]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[632]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[633]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[634]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[635]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[636]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[637]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[638]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[639]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[640]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[641]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[642]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[643]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[644]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[645]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[646]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[647]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[648]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[649]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[650]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[651]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[652]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[653]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[654]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[655]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[656]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[657]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[658]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[659]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[660]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[661]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[662]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[663]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[664]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[665]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[666]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[667]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[668]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[669]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[670]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[671]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[672]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[673]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[674]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[675]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[676]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[677]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[678]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[679]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[680]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[681]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[682]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[683]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[684]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[685]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[686]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[687]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[688]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[689]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[690]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[691]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[692]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[693]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[694]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[695]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[696]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[697]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[698]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[699]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[700]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[701]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[702]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[703]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[704]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[705]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[706]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[707]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[708]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[709]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[710]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[711]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[712]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[713]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[714]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[715]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[716]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[717]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[718]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[719]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[720]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[721]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[722]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[723]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[724]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[725]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[726]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[727]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[728]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[729]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[730]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[731]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[732]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[733]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[734]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[735]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[736]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[737]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[738]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[739]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[740]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[741]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[742]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[743]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[744]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[745]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[746]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[747]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[748]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[749]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[750]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[751]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[752]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[753]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[754]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[755]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[756]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[757]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[758]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[759]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[760]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[761]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[762]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[763]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[764]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[765]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[766]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[767]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[768]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[769]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[770]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[771]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[772]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[773]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[774]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[775]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[776]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[777]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[778]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[779]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[780]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[781]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[782]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[783]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[784]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[785]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[786]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[787]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[788]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[789]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[790]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[791]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[792]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[793]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[794]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[795]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[796]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[797]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[798]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[799]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[800]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[801]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[802]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[803]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[804]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[805]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[806]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[807]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[808]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[809]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[810]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[811]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[812]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[813]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[814]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[815]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[816]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[817]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[818]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[819]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[820]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[821]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[822]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[823]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[824]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[825]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[826]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[827]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[828]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[829]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[830]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[831]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[832]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[833]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[834]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[835]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[836]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[837]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[838]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[839]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[840]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[841]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[842]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[843]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[844]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[845]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[846]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[847]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[848]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[849]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[850]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[851]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[852]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[853]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[854]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[855]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[856]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[857]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[858]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[859]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[860]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[861]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[862]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[863]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[864]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[865]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[866]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[867]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[868]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[869]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[870]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[871]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[872]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[873]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[874]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[875]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[876]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[877]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[878]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[879]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[880]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[881]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[882]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[883]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[884]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[885]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[886]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[887]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[888]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[889]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[890]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[891]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[892]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[893]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[894]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[895]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[896]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[897]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[898]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[899]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[900]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[901]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[902]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[903]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[904]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[905]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[906]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[907]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[908]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[909]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[910]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[911]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[912]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[913]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[914]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[915]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[916]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[917]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[918]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[919]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[920]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[921]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[922]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[923]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[924]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[925]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[926]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[927]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[928]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[929]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[930]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[931]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[932]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[933]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[934]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[935]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[936]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[937]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[938]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[939]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[940]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[941]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[942]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[943]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[944]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[945]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[946]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[947]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[948]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[949]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[950]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[951]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[952]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[953]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[954]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[955]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[956]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[957]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[958]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[959]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[960]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[961]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[962]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[963]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[964]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[965]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[966]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[967]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[968]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[969]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[970]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[971]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[972]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[973]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[974]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[975]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[976]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[977]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[978]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[979]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[980]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[981]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[982]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[983]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[984]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[985]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[986]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[987]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[988]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[989]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[990]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[991]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[992]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[993]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[994]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[995]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[996]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[997]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[998]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "LogBuffer[999]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                }
+            }
         }
     },
     {
@@ -5341,6 +9434,7 @@
         "id": "3cee47bf14e4f7a8",
         "type": "eth-ip in",
         "z": "2a81416e0ebc91b9",
+        "d": true,
         "g": "90f349e5df2c52fe",
         "endpoint": "203f07952504de9b",
         "mode": "single",
@@ -5355,7 +9449,8 @@
         "y": 400,
         "wires": [
             [
-                "348e9b3c865345a4"
+                "348e9b3c865345a4",
+                "0e7cb3495d8521b3"
             ]
         ]
     },
@@ -6379,6 +10474,23 @@
         "wires": [
             []
         ]
+    },
+    {
+        "id": "0e7cb3495d8521b3",
+        "type": "debug",
+        "z": "2a81416e0ebc91b9",
+        "g": "90f349e5df2c52fe",
+        "name": "debug 3",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "false",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 220,
+        "y": 320,
+        "wires": []
     },
     {
         "id": "e23a3d19d99c9560",
@@ -10193,6 +14305,582 @@
         "statusType": "auto",
         "x": 1000,
         "y": 1040,
+        "wires": []
+    },
+    {
+        "id": "e31d6f9de41fb9c6",
+        "type": "comment",
+        "z": "e8106a54c29302b7",
+        "name": "READ ME",
+        "info": "Poll cycle:  eth-ip in LogUDT_1/_2 -> cache | 5s tick -> combine -> process -> mysql -> writeback ReadIndex + SpillReadIndex\nInspector:   10s tick -> summarize cached state",
+        "x": 110,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "fa1b682f9c6cba99",
+        "type": "eth-ip in",
+        "z": "e8106a54c29302b7",
+        "endpoint": "a5d38873d5c95404",
+        "mode": "all",
+        "variable": "",
+        "program": "",
+        "name": "READ LogUDT_1 (control tags)",
+        "gatherMetrics": false,
+        "includeTimestamp": true,
+        "addErrorOutput": false,
+        "outputs": 1,
+        "x": 160,
+        "y": 140,
+        "wires": [
+            [
+                "501e6f43b98002a2"
+            ]
+        ]
+    },
+    {
+        "id": "501e6f43b98002a2",
+        "type": "function",
+        "z": "e8106a54c29302b7",
+        "name": "cache control tags",
+        "func": "// Store latest snapshot of control tags from LogUDT_1 endpoint.\nflow.set('latest_LogUDT_1', msg.payload);\nflow.set('latest_LogUDT_1_ts', Date.now());\nnode.status({ fill: 'green', shape: 'dot', text: `WI=${msg.payload.WriteIndex} RI=${msg.payload.ReadIndex}` });\nreturn null;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 140,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "58d35c41647dd8a0",
+        "type": "eth-ip in",
+        "z": "e8106a54c29302b7",
+        "endpoint": "1b55b1afbce46b8d",
+        "mode": "all",
+        "variable": "",
+        "program": "",
+        "name": "READ LogUDT_2 (buffers)",
+        "gatherMetrics": false,
+        "includeTimestamp": true,
+        "addErrorOutput": false,
+        "outputs": 1,
+        "x": 160,
+        "y": 200,
+        "wires": [
+            [
+                "18d40ea6cabec73e"
+            ]
+        ]
+    },
+    {
+        "id": "18d40ea6cabec73e",
+        "type": "function",
+        "z": "e8106a54c29302b7",
+        "name": "cache buffers",
+        "func": "// Convert flat-key payload from eth-ip driver to proper arrays.\n// The driver returns array elements as separate object keys:\n//   { 'LogBuffer[0]': {...}, 'LogBuffer[1]': {...}, ..., 'SpillBuffer[0]': {...} }\n// We want:\n//   { LogBuffer: [ {...}, {...}, ... ], SpillBuffer: [ {...}, ... ] }\n\nconst LOG_SIZE = 1000;\nconst SPILL_SIZE = 10000;\nconst logBufferArr = new Array(LOG_SIZE);\nconst spillBufferArr = new Array(SPILL_SIZE);\n\nfor (const key of Object.keys(msg.payload)) {\n    const lbMatch = key.match(/^LogBuffer\\[(\\d+)\\]$/);\n    if (lbMatch) {\n        logBufferArr[parseInt(lbMatch[1], 10)] = msg.payload[key];\n        continue;\n    }\n    const sbMatch = key.match(/^SpillBuffer\\[(\\d+)\\]$/);\n    if (sbMatch) {\n        spillBufferArr[parseInt(sbMatch[1], 10)] = msg.payload[key];\n    }\n}\n\n// Fill any missing slots with empty records so downstream loops don't crash\nconst emptyRec = { Value: 0, TagID: 0, DataType: 0, DateTime: 0, SeqID: 0 };\nfor (let i = 0; i < LOG_SIZE; i++) if (!logBufferArr[i]) logBufferArr[i] = emptyRec;\nfor (let i = 0; i < SPILL_SIZE; i++) if (!spillBufferArr[i]) spillBufferArr[i] = emptyRec;\n\nflow.set('latest_LogUDT_2', { LogBuffer: logBufferArr, SpillBuffer: spillBufferArr });\nflow.set('latest_LogUDT_2_ts', Date.now());\nnode.status({ fill: 'green', shape: 'dot', text: `LB=${LOG_SIZE} SB=${SPILL_SIZE}` });\nreturn null;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 200,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "2fe0e87cce82ad52",
+        "type": "inject",
+        "z": "e8106a54c29302b7",
+        "name": "5s poll tick",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "8",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 320,
+        "wires": [
+            [
+                "a5e691d5b9eec18e"
+            ]
+        ]
+    },
+    {
+        "id": "a5e691d5b9eec18e",
+        "type": "function",
+        "z": "e8106a54c29302b7",
+        "name": "combine cached snapshots",
+        "func": "// Pull latest snapshots from both eth-ip in caches.\n// Build the payload shape that process_fn expects.\nconst u1 = flow.get('latest_LogUDT_1');\nconst u2 = flow.get('latest_LogUDT_2');\nconst t1 = flow.get('latest_LogUDT_1_ts') || 0;\nconst t2 = flow.get('latest_LogUDT_2_ts') || 0;\n\nif (!u1 || !u2) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'waiting for first eth-ip read' });\n    return null;\n}\n\n// Reject stale snapshots (>15s) - probably PLC comm issue\nconst staleness = Date.now() - Math.min(t1, t2);\nif (staleness > 15000) {\n    node.status({ fill: 'red', shape: 'ring', text: `cache stale (${Math.round(staleness/1000)}s)` });\n    node.warn(`Cache stale: t1=${t1}, t2=${t2}, age=${staleness}ms`);\n    return null;\n}\n\nmsg.payload = {\n    WriteIndex: u1.WriteIndex,\n    ReadIndex: u1.ReadIndex,\n    GlobalSeqID: u1.GlobalSeqID,\n    SpillWriteIndex: u1.SpillWriteIndex,\n    SpillReadIndex: u1.SpillReadIndex,\n    BufferFull: u1.BufferFull,\n    SpillFull: u1.SpillFull,\n    DroppedRecordCount: u1.DroppedRecordCount,\n    LogBuffer: u2.LogBuffer,\n    SpillBuffer: u2.SpillBuffer\n};\n\nnode.status({ fill: 'blue', shape: 'dot', text: `WI=${u1.WriteIndex} RI=${u1.ReadIndex} SeqID=${u1.GlobalSeqID}` });\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 380,
+        "y": 320,
+        "wires": [
+            [
+                "d78a49626ee4b7a9"
+            ]
+        ]
+    },
+    {
+        "id": "d78a49626ee4b7a9",
+        "type": "function",
+        "z": "e8106a54c29302b7",
+        "name": "validate + build INSERT batch",
+        "func": "// Main processing logic\nconst data = msg.payload;\nconst LOG_SIZE = 1000;\nconst SPILL_SIZE = Array.isArray(data.SpillBuffer) ? data.SpillBuffer.length : 10000;\nconst lastSeqId = context.get('lastSeqId');\nconst effectiveLastSeqId = (lastSeqId === undefined || lastSeqId === null) ? -1 : lastSeqId;\n\nconst records = [];\n\nif (!Array.isArray(data.LogBuffer) || !Array.isArray(data.SpillBuffer)) {\n    node.error('LogBuffer or SpillBuffer is not an array - check eth-ip endpoint config');\n    node.status({ fill: 'red', shape: 'ring', text: 'bad payload shape' });\n    return null;\n}\n\n// ---- Drain spill first (oldest data) ----\nlet spillIdx = data.SpillReadIndex;\nlet spillSafety = 0;\nwhile (spillIdx < data.SpillWriteIndex && spillSafety < SPILL_SIZE + 10) {\n    const rec = data.SpillBuffer[spillIdx % SPILL_SIZE];\n    if (rec && rec.SeqID > effectiveLastSeqId) {\n        records.push({ ...rec, source_buffer: 'spill' });\n    }\n    spillIdx++;\n    spillSafety++;\n}\n\n// ---- Drain LogBuffer slice [ReadIndex .. WriteIndex) ----\nlet logIdx = data.ReadIndex;\nlet logSafety = 0;\nwhile (logIdx !== data.WriteIndex && logSafety < LOG_SIZE + 10) {\n    const rec = data.LogBuffer[logIdx];\n    if (rec && rec.SeqID > effectiveLastSeqId) {\n        records.push({ ...rec, source_buffer: 'log' });\n    }\n    logIdx = (logIdx + 1) % LOG_SIZE;\n    logSafety++;\n}\n\nrecords.sort((a, b) => a.SeqID - b.SeqID);\n\n// Detect SeqID gaps\nconst gaps = [];\nfor (let i = 0; i < records.length - 1; i++) {\n    if (records[i + 1].SeqID > records[i].SeqID + 1) {\n        gaps.push({\n            from: records[i].SeqID + 1,\n            to: records[i + 1].SeqID - 1\n        });\n    }\n}\nif (gaps.length > 0) {\n    node.warn(`SeqID gaps detected: ${JSON.stringify(gaps)}`);\n}\n\nif (data.SpillFull) {\n    node.warn(`SpillFull=1, DroppedRecordCount=${data.DroppedRecordCount}`);\n}\n\nif (records.length === 0) {\n    node.status({ fill: 'grey', shape: 'dot', text: 'no new records' });\n    return null;\n}\n\nconst placeholders = records.map(() => '(?,?,?,?,?,?)').join(',');\nconst sql = `INSERT IGNORE INTO log_records ` +\n    `(seq_id, tag_id, value_raw, date_time, data_type, source_buffer) ` +\n    `VALUES ${placeholders}`;\n\nconst params = [];\nfor (const r of records) {\n    params.push(r.SeqID, r.TagID, r.Value, r.DateTime, r.DataType, r.source_buffer);\n}\n\nmsg.topic = sql;\nmsg.payload = params;\nmsg.newReadIndex = data.WriteIndex;\nmsg.newSpillReadIndex = data.SpillWriteIndex;\nmsg.newLastSeqId = records[records.length - 1].SeqID;\nmsg.recordCount = records.length;\nmsg.gaps = gaps;\n\nnode.status({\n    fill: 'blue',\n    shape: 'dot',\n    text: `inserting ${records.length}, last SeqID ${msg.newLastSeqId}`\n});\n\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 670,
+        "y": 320,
+        "wires": [
+            [
+                "7d41ab9899649244"
+            ]
+        ]
+    },
+    {
+        "id": "7d41ab9899649244",
+        "type": "mysql",
+        "z": "e8106a54c29302b7",
+        "mydb": "3ad98402733282af",
+        "name": "INSERT log_records",
+        "x": 960,
+        "y": 320,
+        "wires": [
+            [
+                "88c2634bc3544d40"
+            ]
+        ]
+    },
+    {
+        "id": "88c2634bc3544d40",
+        "type": "function",
+        "z": "e8106a54c29302b7",
+        "name": "commit + writeback indices",
+        "func": "// On success, persist progress and write new ReadIndex / SpillReadIndex back to the PLC.\n// Output 0 -> eth-ip out: ReadIndex\n// Output 1 -> eth-ip out: SpillReadIndex\n\nif (!msg.payload || msg.payload.affectedRows === undefined) {\n    node.error('MySQL insert failed - keeping indices unchanged');\n    node.status({ fill: 'red', shape: 'ring', text: 'INSERT failed' });\n    return null;\n}\n\nconst affected = msg.payload.affectedRows;\nconst expected = msg.recordCount;\n\nif (affected < expected) {\n    node.log(`INSERT: ${affected}/${expected} rows inserted (rest were duplicates from INSERT IGNORE)`);\n}\n\ncontext.set('lastSeqId', msg.newLastSeqId);\n\nconst readIdxMsg = { payload: msg.newReadIndex };\nconst spillIdxMsg = { payload: msg.newSpillReadIndex };\n\nnode.status({\n    fill: 'green',\n    shape: 'dot',\n    text: `${affected} rows -> RI=${msg.newReadIndex} SRI=${msg.newSpillReadIndex}`\n});\n\nreturn [ readIdxMsg, spillIdxMsg ];\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 1210,
+        "y": 320,
+        "wires": [
+            [
+                "417d8b11aecb340d"
+            ],
+            [
+                "b51ae40bea46635f"
+            ]
+        ]
+    },
+    {
+        "id": "417d8b11aecb340d",
+        "type": "eth-ip out",
+        "z": "e8106a54c29302b7",
+        "endpoint": "a5d38873d5c95404",
+        "variable": "ReadIndex",
+        "program": "",
+        "name": "WRITE ReadIndex",
+        "x": 1480,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "b51ae40bea46635f",
+        "type": "eth-ip out",
+        "z": "e8106a54c29302b7",
+        "endpoint": "a5d38873d5c95404",
+        "variable": "SpillReadIndex",
+        "program": "",
+        "name": "WRITE SpillReadIndex",
+        "x": 1490,
+        "y": 350,
+        "wires": []
+    },
+    {
+        "id": "4fbabd842effaac3",
+        "type": "inject",
+        "z": "e8106a54c29302b7",
+        "name": "10s inspect",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 440,
+        "wires": [
+            [
+                "9d1fdbef05e07be0"
+            ]
+        ]
+    },
+    {
+        "id": "9d1fdbef05e07be0",
+        "type": "function",
+        "z": "e8106a54c29302b7",
+        "name": "summarize cached state",
+        "func": "const u1 = flow.get('latest_LogUDT_1');\nconst t1 = flow.get('latest_LogUDT_1_ts') || 0;\nconst t2 = flow.get('latest_LogUDT_2_ts') || 0;\nif (!u1) {\n    msg.payload = 'no PLC data cached yet';\n    return msg;\n}\nconst fill = (u1.WriteIndex - u1.ReadIndex + 1000) % 1000;\nconst spillCount = u1.SpillWriteIndex - u1.SpillReadIndex;\nmsg.payload = {\n    fill_pct: ((fill / 1000) * 100).toFixed(1) + '%',\n    WriteIndex: u1.WriteIndex,\n    ReadIndex: u1.ReadIndex,\n    GlobalSeqID: u1.GlobalSeqID,\n    SpillCount: spillCount,\n    SpillFull: u1.SpillFull,\n    BufferFull: u1.BufferFull,\n    DroppedRecordCount: u1.DroppedRecordCount,\n    lastSeqIdProcessed: context.get('lastSeqId'),\n    cacheAgeSec: Math.round((Date.now() - Math.min(t1, t2)) / 1000)\n};\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 360,
+        "y": 440,
+        "wires": [
+            [
+                "4447a0f4bfbc3bd9"
+            ]
+        ]
+    },
+    {
+        "id": "4447a0f4bfbc3bd9",
+        "type": "debug",
+        "z": "e8106a54c29302b7",
+        "name": "state snapshot",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 440,
+        "wires": []
+    },
+    {
+        "id": "ff50913d8a12bec8",
+        "type": "comment",
+        "z": "d4a89cbeab1a35c8",
+        "name": "READ ME",
+        "info": "Heartbeat path:  1s tick -> increment counter -> eth-ip out NodeRedHeartbeat\nPoll cycle:      eth-ip in LogUDT_1/_2 -> cache | 5s tick -> combine -> process -> mysql -> writeback ReadIndex + SpillReadIndex\nInspector:       10s tick -> summarize cached state",
+        "x": 110,
+        "y": 40,
+        "wires": []
+    },
+    {
+        "id": "7a67a9b195447442",
+        "type": "inject",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "1s tick",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "1",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "2",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 100,
+        "y": 120,
+        "wires": [
+            [
+                "4e86afef3a7337dd"
+            ]
+        ]
+    },
+    {
+        "id": "4e86afef3a7337dd",
+        "type": "function",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "increment NodeRedHeartbeat",
+        "func": "// Maintain a monotonic counter and write to PLC tag NodeRedHeartbeat.\n// PLC HeartbeatRoutine watches this for staleness.\nlet hb = flow.get('NodeRedHeartbeat') || 0;\nhb = (hb + 1) & 0x7FFFFFFF;  // keep within DINT positive range\nflow.set('NodeRedHeartbeat', hb);\n\nmsg.payload = hb;\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 350,
+        "y": 120,
+        "wires": [
+            [
+                "1dbf125a9640604b"
+            ]
+        ]
+    },
+    {
+        "id": "1dbf125a9640604b",
+        "type": "eth-ip out",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "endpoint": "a5d38873d5c95404",
+        "variable": "",
+        "program": "",
+        "name": "WRITE NodeRedHeartbeat",
+        "x": 640,
+        "y": 120,
+        "wires": []
+    },
+    {
+        "id": "0290a0b32f9a0a87",
+        "type": "eth-ip in",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "endpoint": "a5d38873d5c95404",
+        "mode": "all",
+        "variable": "",
+        "program": "",
+        "name": "READ LogUDT_1 (control tags)",
+        "gatherMetrics": false,
+        "includeTimestamp": true,
+        "addErrorOutput": false,
+        "outputs": 1,
+        "x": 160,
+        "y": 220,
+        "wires": [
+            [
+                "e005f7c2b9db11ef"
+            ]
+        ]
+    },
+    {
+        "id": "e005f7c2b9db11ef",
+        "type": "function",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "cache control tags",
+        "func": "// Store latest snapshot of control tags from LogUDT_1 endpoint.\n// Expected payload shape (mode='all'): object keyed by variable name.\nflow.set('latest_LogUDT_1', msg.payload);\nflow.set('latest_LogUDT_1_ts', Date.now());\nnode.status({ fill: 'green', shape: 'dot', text: `WI=${msg.payload.WriteIndex} RI=${msg.payload.ReadIndex}` });\nreturn null;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 220,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "5e26f9cd01539ca5",
+        "type": "eth-ip in",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "endpoint": "1b55b1afbce46b8d",
+        "mode": "all",
+        "variable": "",
+        "program": "",
+        "name": "READ LogUDT_2 (buffers)",
+        "gatherMetrics": false,
+        "includeTimestamp": true,
+        "addErrorOutput": false,
+        "outputs": 1,
+        "x": 160,
+        "y": 280,
+        "wires": [
+            [
+                "8fe809890fccd36d"
+            ]
+        ]
+    },
+    {
+        "id": "8fe809890fccd36d",
+        "type": "function",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "cache buffers",
+        "func": "// Convert flat-key payload from eth-ip driver to proper arrays.\n// The driver returns array elements as separate object keys:\n//   { 'LogBuffer[0]': {...}, 'LogBuffer[1]': {...}, ..., 'SpillBuffer[0]': {...} }\n// We want:\n//   { LogBuffer: [ {...}, {...}, ... ], SpillBuffer: [ {...}, ... ] }\n\nconst LOG_SIZE = 1000;\nconst SPILL_SIZE = 10000;\nconst logBufferArr = new Array(LOG_SIZE);\nconst spillBufferArr = new Array(SPILL_SIZE);\n\nfor (const key of Object.keys(msg.payload)) {\n    const lbMatch = key.match(/^LogBuffer\\[(\\d+)\\]$/);\n    if (lbMatch) {\n        logBufferArr[parseInt(lbMatch[1], 10)] = msg.payload[key];\n        continue;\n    }\n    const sbMatch = key.match(/^SpillBuffer\\[(\\d+)\\]$/);\n    if (sbMatch) {\n        spillBufferArr[parseInt(sbMatch[1], 10)] = msg.payload[key];\n    }\n}\n\n// Fill any missing slots with empty records so downstream loops don't crash\nconst emptyRec = { Value: 0, TagID: 0, DataType: 0, DateTime: 0, SeqID: 0 };\nfor (let i = 0; i < LOG_SIZE; i++) if (!logBufferArr[i]) logBufferArr[i] = emptyRec;\nfor (let i = 0; i < SPILL_SIZE; i++) if (!spillBufferArr[i]) spillBufferArr[i] = emptyRec;\n\nflow.set('latest_LogUDT_2', { LogBuffer: logBufferArr, SpillBuffer: spillBufferArr });\nflow.set('latest_LogUDT_2_ts', Date.now());\nnode.status({ fill: 'green', shape: 'dot', text: `LB=${LOG_SIZE} SB=${SPILL_SIZE}` });\nreturn null;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 460,
+        "y": 280,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "65868e557eb9a5ec",
+        "type": "inject",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "5s poll tick",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": true,
+        "onceDelay": "8",
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 380,
+        "wires": [
+            [
+                "9e52c2b5179c8f56"
+            ]
+        ]
+    },
+    {
+        "id": "9e52c2b5179c8f56",
+        "type": "function",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "combine cached snapshots",
+        "func": "// Pull latest snapshots from both eth-ip in caches.\n// Build the payload shape that process_fn expects.\nconst u1 = flow.get('latest_LogUDT_1');\nconst u2 = flow.get('latest_LogUDT_2');\nconst t1 = flow.get('latest_LogUDT_1_ts') || 0;\nconst t2 = flow.get('latest_LogUDT_2_ts') || 0;\n\nif (!u1 || !u2) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'waiting for first eth-ip read' });\n    return null;\n}\n\n// Reject stale snapshots (>15s) - probably PLC comm issue\nconst staleness = Date.now() - Math.min(t1, t2);\nif (staleness > 15000) {\n    node.status({ fill: 'red', shape: 'ring', text: `cache stale (${Math.round(staleness/1000)}s)` });\n    node.warn(`Cache stale: t1=${t1}, t2=${t2}, age=${staleness}ms`);\n    return null;\n}\n\nmsg.payload = {\n    WriteIndex: u1.WriteIndex,\n    ReadIndex: u1.ReadIndex,\n    GlobalSeqID: u1.GlobalSeqID,\n    SpillWriteIndex: u1.SpillWriteIndex,\n    SpillReadIndex: u1.SpillReadIndex,\n    PLCHeartbeat: u1.PLCHeartBeat,\n    BufferFull: u1.BufferFull,\n    SpillFull: u1.SpillFull,\n    DroppedRecordCount: u1.DroppedRecordCount,\n    LogBuffer: u2.LogBuffer,\n    SpillBuffer: u2.SpillBuffer\n};\n\nnode.status({ fill: 'blue', shape: 'dot', text: `WI=${u1.WriteIndex} RI=${u1.ReadIndex} SeqID=${u1.GlobalSeqID}` });\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 380,
+        "y": 380,
+        "wires": [
+            [
+                "70820b7465a1fb08"
+            ]
+        ]
+    },
+    {
+        "id": "70820b7465a1fb08",
+        "type": "function",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "validate + build INSERT batch",
+        "func": "// =============================================================\n// Main processing logic\n// =============================================================\nconst data = msg.payload;\nconst LOG_SIZE = 1000;\nconst SPILL_SIZE = Array.isArray(data.SpillBuffer) ? data.SpillBuffer.length : 10000;\nconst lastSeqId = context.get('lastSeqId');\nconst effectiveLastSeqId = (lastSeqId === undefined || lastSeqId === null) ? -1 : lastSeqId;\n\nconst records = [];\n\nif (!Array.isArray(data.LogBuffer) || !Array.isArray(data.SpillBuffer)) {\n    node.error('LogBuffer or SpillBuffer is not an array - check eth-ip endpoint config');\n    node.status({ fill: 'red', shape: 'ring', text: 'bad payload shape' });\n    return null;\n}\n\n// ---- Drain spill first (oldest data) ----\nlet spillIdx = data.SpillReadIndex;\nlet spillSafety = 0;\nwhile (spillIdx < data.SpillWriteIndex && spillSafety < SPILL_SIZE + 10) {\n    const rec = data.SpillBuffer[spillIdx % SPILL_SIZE];\n    if (rec && rec.SeqID > effectiveLastSeqId) {\n        records.push({ ...rec, source_buffer: 'spill' });\n    }\n    spillIdx++;\n    spillSafety++;\n}\n\n// ---- Drain LogBuffer slice [ReadIndex .. WriteIndex) ----\nlet logIdx = data.ReadIndex;\nlet logSafety = 0;\nwhile (logIdx !== data.WriteIndex && logSafety < LOG_SIZE + 10) {\n    const rec = data.LogBuffer[logIdx];\n    if (rec && rec.SeqID > effectiveLastSeqId) {\n        records.push({ ...rec, source_buffer: 'log' });\n    }\n    logIdx = (logIdx + 1) % LOG_SIZE;\n    logSafety++;\n}\n\nrecords.sort((a, b) => a.SeqID - b.SeqID);\n\nconst gaps = [];\nfor (let i = 0; i < records.length - 1; i++) {\n    if (records[i + 1].SeqID > records[i].SeqID + 1) {\n        gaps.push({\n            from: records[i].SeqID + 1,\n            to: records[i + 1].SeqID - 1\n        });\n    }\n}\nif (gaps.length > 0) {\n    node.warn(`SeqID gaps detected: ${JSON.stringify(gaps)}`);\n}\n\nconst lastHb = context.get('lastPLCHeartbeat');\nif (lastHb !== undefined && lastHb === data.PLCHeartbeat) {\n    node.warn(`PLC heartbeat stalled at ${data.PLCHeartbeat}`);\n}\ncontext.set('lastPLCHeartbeat', data.PLCHeartbeat);\n\nif (data.SpillFull) {\n    node.warn(`SpillFull=1, DroppedRecordCount=${data.DroppedRecordCount}`);\n}\n\nif (records.length === 0) {\n    node.status({ fill: 'grey', shape: 'dot', text: 'no new records' });\n    return null;\n}\n\nconst placeholders = records.map(() => '(?,?,?,?,?,?)').join(',');\nconst sql = `INSERT IGNORE INTO log_records ` +\n    `(seq_id, tag_id, value_raw, date_time, data_type, source_buffer) ` +\n    `VALUES ${placeholders}`;\n\nconst params = [];\nfor (const r of records) {\n    params.push(r.SeqID, r.TagID, r.Value, r.DateTime, r.DataType, r.source_buffer);\n}\n\nmsg.topic = sql;\nmsg.payload = params;\nmsg.newReadIndex = data.WriteIndex;\nmsg.newSpillReadIndex = data.SpillWriteIndex;\nmsg.newLastSeqId = records[records.length - 1].SeqID;\nmsg.recordCount = records.length;\nmsg.gaps = gaps;\n\nnode.status({\n    fill: 'blue',\n    shape: 'dot',\n    text: `inserting ${records.length}, last SeqID ${msg.newLastSeqId}`\n});\n\nreturn msg;\n",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 670,
+        "y": 380,
+        "wires": [
+            [
+                "79ad617025897523"
+            ]
+        ]
+    },
+    {
+        "id": "79ad617025897523",
+        "type": "mysql",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "mydb": "3ad98402733282af",
+        "name": "INSERT log_records",
+        "x": 960,
+        "y": 380,
+        "wires": [
+            [
+                "05d34d44f731bb92"
+            ]
+        ]
+    },
+    {
+        "id": "05d34d44f731bb92",
+        "type": "function",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "commit + writeback indices",
+        "func": "// MySQL insert returned. On success, persist progress and write\n// new ReadIndex / SpillReadIndex back to the PLC.\n//\n// Output 0 -> eth-ip out: ReadIndex\n// Output 1 -> eth-ip out: SpillReadIndex\n\nif (!msg.payload || msg.payload.affectedRows === undefined) {\n    node.error('MySQL insert failed - keeping indices unchanged');\n    node.status({ fill: 'red', shape: 'ring', text: 'INSERT failed' });\n    return null;\n}\n\nconst affected = msg.payload.affectedRows;\nconst expected = msg.recordCount;\n\nif (affected < expected) {\n    node.log(`INSERT: ${affected}/${expected} rows inserted (rest were duplicates from INSERT IGNORE)`);\n}\n\ncontext.set('lastSeqId', msg.newLastSeqId);\n\nconst readIdxMsg = { payload: msg.newReadIndex };\nconst spillIdxMsg = { payload: msg.newSpillReadIndex };\n\nnode.status({\n    fill: 'green',\n    shape: 'dot',\n    text: `${affected} rows -> RI=${msg.newReadIndex} SRI=${msg.newSpillReadIndex}`\n});\n\nreturn [ readIdxMsg, spillIdxMsg ];\n",
+        "outputs": 2,
+        "noerr": 0,
+        "x": 1210,
+        "y": 380,
+        "wires": [
+            [
+                "bf05395297eb5af6"
+            ],
+            [
+                "1c547abe94a151cc"
+            ]
+        ]
+    },
+    {
+        "id": "bf05395297eb5af6",
+        "type": "eth-ip out",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "endpoint": "a5d38873d5c95404",
+        "variable": "ReadIndex",
+        "program": "",
+        "name": "WRITE ReadIndex",
+        "x": 1480,
+        "y": 360,
+        "wires": []
+    },
+    {
+        "id": "1c547abe94a151cc",
+        "type": "eth-ip out",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "endpoint": "a5d38873d5c95404",
+        "variable": "SpillReadIndex",
+        "program": "",
+        "name": "WRITE SpillReadIndex",
+        "x": 1490,
+        "y": 410,
+        "wires": []
+    },
+    {
+        "id": "272ebc4797fe5c96",
+        "type": "inject",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "10s inspect",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "10",
+        "crontab": "",
+        "once": false,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 500,
+        "wires": [
+            [
+                "bb3a836ce0f492a8"
+            ]
+        ]
+    },
+    {
+        "id": "bb3a836ce0f492a8",
+        "type": "function",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "summarize cached state",
+        "func": "const u1 = flow.get('latest_LogUDT_1');\nconst t1 = flow.get('latest_LogUDT_1_ts') || 0;\nconst t2 = flow.get('latest_LogUDT_2_ts') || 0;\nif (!u1) {\n    msg.payload = 'no PLC data cached yet';\n    return msg;\n}\nconst fill = (u1.WriteIndex - u1.ReadIndex + 1000) % 1000;\nconst spillCount = u1.SpillWriteIndex - u1.SpillReadIndex;\nmsg.payload = {\n    fill_pct: ((fill / 1000) * 100).toFixed(1) + '%',\n    WriteIndex: u1.WriteIndex,\n    ReadIndex: u1.ReadIndex,\n    GlobalSeqID: u1.GlobalSeqID,\n    SpillCount: spillCount,\n    SpillFull: u1.SpillFull,\n    BufferFull: u1.BufferFull,\n    DroppedRecordCount: u1.DroppedRecordCount,\n    lastSeqIdProcessed: context.get('lastSeqId'),\n    cacheAgeSec: Math.round((Date.now() - Math.min(t1, t2)) / 1000)\n};\nreturn msg;\n",
+        "outputs": 1,
+        "noerr": 0,
+        "x": 360,
+        "y": 500,
+        "wires": [
+            [
+                "51cfe3b73d78972c"
+            ]
+        ]
+    },
+    {
+        "id": "51cfe3b73d78972c",
+        "type": "debug",
+        "z": "d4a89cbeab1a35c8",
+        "d": true,
+        "name": "state snapshot",
+        "active": true,
+        "tosidebar": true,
+        "console": false,
+        "tostatus": false,
+        "complete": "payload",
+        "targetType": "msg",
+        "statusVal": "",
+        "statusType": "auto",
+        "x": 580,
+        "y": 500,
         "wires": []
     }
 ]
