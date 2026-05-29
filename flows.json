@@ -30,6 +30,66 @@
         "info": ""
     },
     {
+        "id": "sf_mysql_retry",
+        "type": "subflow",
+        "name": "MySQL with Retry",
+        "info": "Runs msg.topic (SQL) with msg.payload (params) against the siroflex DB.\nOn deadlock (1213) or lock-wait timeout (1205), retries up to MAX_RETRIES times with jittered backoff.\n\nOutput 1: success (passes the MySQL result through)\nOutput 2: permanently failed (retries exhausted, or non-retriable error)\n\nEnv vars:\n- MAX_RETRIES (default 3)\n- BASE_DELAY_MS (default 100)\n- JITTER_MS (default 300)",
+        "category": "function",
+        "in": [
+            {
+                "x": 60,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "sfmr_mysql_01"
+                    }
+                ]
+            }
+        ],
+        "out": [
+            {
+                "x": 640,
+                "y": 120,
+                "wires": [
+                    {
+                        "id": "sfmr_mysql_01",
+                        "port": 0
+                    }
+                ]
+            },
+            {
+                "x": 640,
+                "y": 280,
+                "wires": [
+                    {
+                        "id": "sfmr_retry_01",
+                        "port": 1
+                    }
+                ]
+            }
+        ],
+        "env": [
+            {
+                "name": "MAX_RETRIES",
+                "type": "num",
+                "value": "3"
+            },
+            {
+                "name": "BASE_DELAY_MS",
+                "type": "num",
+                "value": "100"
+            },
+            {
+                "name": "JITTER_MS",
+                "type": "num",
+                "value": "300"
+            }
+        ],
+        "meta": {},
+        "color": "#E7E7AE",
+        "icon": "font-awesome/fa-database"
+    },
+    {
         "id": "310c0a8169ae4fac",
         "type": "group",
         "z": "2a81416e0ebc91b9",
@@ -46,8 +106,8 @@
             "393285469e400ec3",
             "f415dc7f255abcb2"
         ],
-        "x": 88,
-        "y": 2913,
+        "x": 48,
+        "y": 2493,
         "w": 2924,
         "h": 2014
     },
@@ -68,8 +128,8 @@
             "a9c21483266ce77f",
             "ec24ce525f9ff1c0"
         ],
-        "x": 88,
-        "y": 4973,
+        "x": 48,
+        "y": 4553,
         "w": 1124,
         "h": 294
     },
@@ -167,8 +227,8 @@
             "44c501f60a72c8b1",
             "bf7c60f88b3928ac"
         ],
-        "x": 94,
-        "y": 1859,
+        "x": 34,
+        "y": 1499,
         "w": 2452,
         "h": 942
     },
@@ -225,31 +285,6 @@
         "h": 654
     },
     {
-        "id": "step1_group",
-        "type": "group",
-        "z": "2a81416e0ebc91b9",
-        "name": "Tag Table Mapping Sync (Step 1)",
-        "style": {
-            "label": true
-        },
-        "nodes": [
-            "step1_hoa_read",
-            "step1_hoa_one_switch",
-            "step1_build_sync",
-            "step1_mysql_sync",
-            "step1_set_zero",
-            "step1_write_hoa_zero",
-            "032611c16dcb14d0",
-            "0beba35e73221cae",
-            "4f3a9a7aa7a07331",
-            "fa0248a02d6a0a59"
-        ],
-        "x": 94,
-        "y": 139,
-        "w": 1532,
-        "h": 222
-    },
-    {
         "id": "ac584d34dd76dcf0",
         "type": "group",
         "z": "8d43ac9716ebf024",
@@ -304,8 +339,8 @@
             "9097598738993f6f",
             "a4a89742d8c41468"
         ],
-        "x": 114,
-        "y": 2939,
+        "x": 74,
+        "y": 2519,
         "w": 1952,
         "h": 422
     },
@@ -429,8 +464,8 @@
             "4e5aafb3ac9826d0",
             "88ddabe6e882f665"
         ],
-        "x": 114,
-        "y": 3399,
+        "x": 74,
+        "y": 2979,
         "w": 2872,
         "h": 1502
     },
@@ -448,8 +483,8 @@
             "bd9d3d9eae9417e2",
             "d45f1e5215a2f89f"
         ],
-        "x": 114,
-        "y": 4999,
+        "x": 74,
+        "y": 4579,
         "w": 692,
         "h": 82
     },
@@ -471,8 +506,8 @@
             "on_error",
             "plc_db_status"
         ],
-        "x": 114,
-        "y": 5099,
+        "x": 74,
+        "y": 4679,
         "w": 1072,
         "h": 142
     },
@@ -734,6 +769,114 @@
         "h": 142
     },
     {
+        "id": "681514f16e6da48b",
+        "type": "group",
+        "z": "2a81416e0ebc91b9",
+        "name": "Tag Table Mapping Sync (Step 1)",
+        "style": {
+            "label": true
+        },
+        "nodes": [
+            "29e3779e86de9c32",
+            "8e514499706171c9",
+            "7bb7a4ba9c3620a6",
+            "e3520118b160de2b",
+            "c092e828fda6d42b",
+            "db2ba734241f0b1a",
+            "d18eb46d5d56d09c",
+            "b9e71778de2fe6c7",
+            "4307a55f2503d0fe",
+            "389a3f9f0306acd0",
+            "55485485c219433f",
+            "52e2a2a4e8a117c3",
+            "9f093a48b2913493",
+            "96f7d10bee1606b9",
+            "b3deac6136e1e374",
+            "ec92897434f8aaa7",
+            "7c42c1cb0a374b03",
+            "203a03da892f0e1b",
+            "9b6dbc58d80ab285",
+            "4170fe26b30a0c5f",
+            "07dd6f91ba406a5a",
+            "0b662debeb4d802e"
+        ],
+        "x": 74,
+        "y": 59,
+        "w": 2012,
+        "h": 362
+    },
+    {
+        "id": "5f0efb6852ce9a70",
+        "type": "group",
+        "z": "2a81416e0ebc91b9",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "8bdf430c2d762421",
+            "04548be1127c49b6",
+            "8909f4585187230d",
+            "9277197bc36a6c8e",
+            "1f1e76a6c1fd2325",
+            "6638fbd74f6933e3",
+            "e5fe74eb6cd1ab93",
+            "ba51f46ea5435f91",
+            "b3b93eb72a0245f3",
+            "12d712874e140530",
+            "524fefa805087378",
+            "7eeca96461dfb2b2",
+            "b0ad1a6b8e0b4bae",
+            "2ae31aebfd578c09",
+            "6ea8d3a49890dad9",
+            "49f8a3220dda7139",
+            "943752fd54d99017",
+            "aec258bce3b1d3ca",
+            "d4d6d93bfaf6fde9",
+            "cdfcacb0065c2894",
+            "dc14af6ffe5bf1dc",
+            "2ce5997e7010829e",
+            "85b99fda36f08353"
+        ],
+        "x": 74,
+        "y": 819,
+        "w": 2292,
+        "h": 582
+    },
+    {
+        "id": "905db611a408d18f",
+        "type": "group",
+        "z": "2a81416e0ebc91b9",
+        "style": {
+            "stroke": "#999999",
+            "stroke-opacity": "1",
+            "fill": "none",
+            "fill-opacity": "1",
+            "label": true,
+            "label-position": "nw",
+            "color": "#a4a4a4"
+        },
+        "nodes": [
+            "f0f7923f65687ed0",
+            "8e2735785bb1a582",
+            "a1a8c07e75ad029c",
+            "6efc9ffe337aade9",
+            "810e519fb977758f",
+            "45edf1ee5a68549e",
+            "9989df7f7e21e86e",
+            "20799d0df92a089f"
+        ],
+        "x": 74,
+        "y": 479,
+        "w": 1312,
+        "h": 242
+    },
+    {
         "id": "a8c693d362e66152",
         "type": "junction",
         "z": "69463a3c2d9abf42",
@@ -846,81 +989,6 @@
         "visible": "true",
         "disabled": "false",
         "groupType": "default"
-    },
-    {
-        "id": "424609d3f59a5919",
-        "type": "ui_tab",
-        "name": "Gauge",
-        "icon": "dashboard",
-        "order": 2,
-        "disabled": false,
-        "hidden": false
-    },
-    {
-        "id": "a284fdaa38c18f81",
-        "type": "ui_group",
-        "name": "Micro820",
-        "tab": "424609d3f59a5919",
-        "order": 1,
-        "disp": true,
-        "width": 9,
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "f6f7b858a9280a8e",
-        "type": "ui_group",
-        "name": "Micro820_Graph",
-        "tab": "424609d3f59a5919",
-        "order": 2,
-        "disp": true,
-        "width": 10,
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "6c243f4022468ed7",
-        "type": "ui_group",
-        "name": "5069-L306ERM",
-        "tab": "424609d3f59a5919",
-        "order": 4,
-        "disp": true,
-        "width": "8",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "3d9b83d70f018b8a",
-        "type": "ui_group",
-        "name": "5069_Graph",
-        "tab": "424609d3f59a5919",
-        "order": 5,
-        "disp": true,
-        "width": "10",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "0ab4fa19da5a9554",
-        "type": "ui_group",
-        "name": "S7-1200",
-        "tab": "424609d3f59a5919",
-        "order": 6,
-        "disp": true,
-        "width": "8",
-        "collapse": false,
-        "className": ""
-    },
-    {
-        "id": "96ede8d7ee3253c7",
-        "type": "ui_group",
-        "name": "Siemen_Graph",
-        "tab": "424609d3f59a5919",
-        "order": 6,
-        "disp": true,
-        "width": "10",
-        "collapse": false,
-        "className": ""
     },
     {
         "id": "a87cc3a1b19c2f79",
@@ -1565,6 +1633,13 @@
             "bgPage": "#4b5563",
             "groupBg": "#ffffff",
             "groupOutline": "#cccccc"
+        },
+        "sizes": {
+            "density": "default",
+            "pagePadding": "12px",
+            "groupGap": "12px",
+            "groupBorderRadius": "4px",
+            "widgetGap": "12px"
         }
     },
     {
@@ -1818,18 +1893,6 @@
         "groupType": "default"
     },
     {
-        "id": "907f12661ce0bc23",
-        "type": "ui-theme",
-        "name": "FF Theme",
-        "colors": {
-            "surface": "#1f2937",
-            "primary": "#8ce2e7",
-            "bgPage": "#4b5563",
-            "groupBg": "#ffffff",
-            "groupOutline": "#cccccc"
-        }
-    },
-    {
         "id": "8a6ea343382f7346",
         "type": "ui-spacer",
         "group": "a999bb77a448b6b8",
@@ -1904,23 +1967,6 @@
                 }
             }
         }
-    },
-    {
-        "id": "c6110c504fb6c08a",
-        "type": "ui_tab",
-        "name": "PLC Monitor",
-        "icon": "dashboard",
-        "order": 1
-    },
-    {
-        "id": "4be38bee2a42fab4",
-        "type": "ui_group",
-        "name": "Insert Counter",
-        "tab": "c6110c504fb6c08a",
-        "order": 1,
-        "disp": true,
-        "width": "6",
-        "collapse": false
     },
     {
         "id": "7abde16a35cd837c",
@@ -2000,18 +2046,6 @@
                     "mapping": ""
                 }
             }
-        }
-    },
-    {
-        "id": "7f6c9baf901d3688",
-        "type": "ui-theme",
-        "name": "FF Theme",
-        "colors": {
-            "surface": "#1f2937",
-            "primary": "#8ce2e7",
-            "bgPage": "#4b5563",
-            "groupBg": "#ffffff",
-            "groupOutline": "#cccccc"
         }
     },
     {
@@ -2830,6 +2864,406 @@
                     "mapping": ""
                 },
                 "MB_LogNUM_Buffer[199]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[200]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[201]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[202]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[203]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[204]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[205]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[206]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[207]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[208]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[209]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[210]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[211]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[212]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[213]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[214]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[215]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[216]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[217]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[218]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[219]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[220]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[221]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[222]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[223]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[224]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[225]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[226]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[227]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[228]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[229]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[230]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[231]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[232]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[233]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[234]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[235]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[236]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[237]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[238]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[239]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[240]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[241]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[242]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[243]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[244]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[245]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[246]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[247]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[248]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[249]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[250]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[251]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[252]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[253]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[254]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[255]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[256]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[257]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[258]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[259]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[260]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[261]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[262]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[263]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[264]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[265]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[266]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[267]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[268]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[269]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[270]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[271]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[272]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[273]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[274]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[275]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[276]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[277]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[278]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[279]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[280]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[281]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[282]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[283]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[284]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[285]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[286]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[287]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[288]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[289]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[290]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[291]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[292]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[293]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[294]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[295]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[296]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[297]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[298]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogNUM_Buffer[299]": {
                     "type": "STRUCT",
                     "mapping": ""
                 }
@@ -5675,12 +6109,12 @@
         "connectedMess": true,
         "vartable": {
             "": {
-                "MB_LogSTR_Buffer_TX.RDindex": {
+                "MB_LogSTR_Buffer_TX.WRindex": {
                     "type": "DINT",
                     "mapping": ""
                 },
-                "MB_LogSTR_Buffer_TX.WRindex": {
-                    "type": "INT",
+                "MB_LogSTR_Buffer_TX.RDindex": {
+                    "type": "DINT",
                     "mapping": ""
                 },
                 "MB_LogSTR_Buffer[0]": {
@@ -6482,33 +6916,459 @@
                 "MB_LogSTR_Buffer[199]": {
                     "type": "STRUCT",
                     "mapping": ""
+                },
+                "MB_LogSTR_Buffer[200]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[201]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[202]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[203]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[204]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[205]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[206]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[207]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[208]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[209]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[210]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[211]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[212]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[213]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[214]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[215]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[216]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[217]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[218]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[219]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[220]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[221]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[222]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[223]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[224]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[225]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[226]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[227]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[228]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[229]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[230]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[231]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[232]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[233]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[234]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[235]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[236]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[237]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[238]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[239]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[240]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[241]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[242]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[243]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[244]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[245]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[246]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[247]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[248]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[249]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[250]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[251]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[252]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[253]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[254]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[255]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[256]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[257]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[258]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[259]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[260]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[261]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[262]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[263]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[264]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[265]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[266]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[267]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[268]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[269]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[270]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[271]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[272]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[273]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[274]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[275]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[276]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[277]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[278]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[279]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[280]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[281]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[282]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[283]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[284]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[285]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[286]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[287]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[288]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[289]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[290]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[291]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[292]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[293]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[294]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[295]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[296]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[297]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[298]": {
+                    "type": "STRUCT",
+                    "mapping": ""
+                },
+                "MB_LogSTR_Buffer[299]": {
+                    "type": "STRUCT",
+                    "mapping": ""
                 }
             }
         }
     },
     {
-        "id": "7c1463bd082d4903",
-        "type": "cip-endpoint",
-        "name": "",
-        "address": "10.10.12.204",
-        "port": 44818,
-        "slot": "",
-        "routingPath": "",
-        "connTimeout": 5000,
-        "retryInterval": 5000,
-        "useMicro800": false
+        "id": "sfmr_mysql_01",
+        "type": "mysql",
+        "z": "sf_mysql_retry",
+        "mydb": "3ad98402733282af",
+        "name": "MySQL (retryable)",
+        "x": 450,
+        "y": 140,
+        "wires": [
+            []
+        ]
     },
     {
-        "id": "c333333333333",
-        "type": "cip-endpoint",
-        "name": "CompactLogix",
-        "address": "10.10.12.204",
-        "port": "44818",
-        "slot": "0",
-        "routingPath": "",
-        "connTimeout": "15000",
-        "retryInterval": "5000",
-        "useMicro800": false
+        "id": "sfmr_catch_01",
+        "type": "catch",
+        "z": "sf_mysql_retry",
+        "name": "Catch this node's errors",
+        "scope": [
+            "sfmr_mysql_01"
+        ],
+        "uncaught": false,
+        "x": 200,
+        "y": 280,
+        "wires": [
+            [
+                "sfmr_retry_01"
+            ]
+        ]
+    },
+    {
+        "id": "sfmr_retry_01",
+        "type": "function",
+        "z": "sf_mysql_retry",
+        "name": "Retry Gate",
+        "func": "const MAX_RETRIES = Number(env.get('MAX_RETRIES')) || 3;\nconst BASE_DELAY_MS = Number(env.get('BASE_DELAY_MS')) || 100;\nconst JITTER_MS = Number(env.get('JITTER_MS')) || 300;\n\nconst err = msg.error || {};\nconst code = err.source?.errno ?? err.code;\nconst message = err.message || '';\nconst isDeadlock = code === 1213 || code === 'ER_LOCK_DEADLOCK' || /deadlock/i.test(message);\nconst isLockTimeout = code === 1205 || code === 'ER_LOCK_WAIT_TIMEOUT';\n\nif (!isDeadlock && !isLockTimeout) {\n    node.warn('Non-retriable MySQL error: ' + message);\n    node.status({ fill: 'red', shape: 'dot', text: 'failed (non-retriable)' });\n    return [null, msg];\n}\n\nif (!msg.topic) {\n    node.warn('Retriable error but no msg.topic to replay; routing to failed');\n    return [null, msg];\n}\n\nconst retryCount = msg._retryCount || 0;\nif (retryCount >= MAX_RETRIES) {\n    node.error((isDeadlock ? 'Deadlock' : 'Lock timeout') + ' retries exhausted (' + MAX_RETRIES + ')');\n    node.status({ fill: 'red', shape: 'dot', text: 'failed (exhausted)' });\n    return [null, msg];\n}\n\nmsg._retryCount = retryCount + 1;\nconst delay = BASE_DELAY_MS + Math.floor(Math.random() * JITTER_MS);\nnode.status({ fill: 'yellow', shape: 'ring', text: 'retry ' + msg._retryCount + '/' + MAX_RETRIES });\nnode.warn((isDeadlock ? 'Deadlock' : 'Lock timeout') + ', retry ' + msg._retryCount + '/' + MAX_RETRIES + ' in ' + delay + 'ms');\n\ndelete msg.error;\n\nsetTimeout(function () { node.send([msg, null]); }, delay);\nreturn null;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 310,
+        "y": 280,
+        "wires": [
+            [
+                "sfmr_mysql_01"
+            ],
+            []
+        ]
     },
     {
         "id": "e23a3d19d99c9560",
@@ -10827,8 +11687,8 @@
         "includeTimestamp": false,
         "addErrorOutput": false,
         "outputs": 1,
-        "x": 320,
-        "y": 3240,
+        "x": 280,
+        "y": 2820,
         "wires": [
             [
                 "fcea3801cef1aa2f"
@@ -10845,8 +11705,8 @@
         "variable": "nodeRedTriggers.1",
         "program": "",
         "name": "Write Trigger 1 Off",
-        "x": 1390,
-        "y": 3160,
+        "x": 1350,
+        "y": 2740,
         "wires": []
     },
     {
@@ -10866,8 +11726,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 620,
-        "y": 3240,
+        "x": 580,
+        "y": 2820,
         "wires": [
             [
                 "6edc1ca2d5574abf"
@@ -10885,8 +11745,8 @@
         "method": "get",
         "upload": false,
         "swaggerDoc": "",
-        "x": 610,
-        "y": 3080,
+        "x": 570,
+        "y": 2660,
         "wires": [
             [
                 "fc42039fceab62d9",
@@ -10908,8 +11768,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1000,
-        "y": 3080,
+        "x": 960,
+        "y": 2660,
         "wires": [
             [
                 "5d4f7d666aec8f30"
@@ -10929,8 +11789,8 @@
         "variable": "nodeRedTriggers.0",
         "program": "",
         "name": "Write Trigger 0 On",
-        "x": 1390,
-        "y": 3080,
+        "x": 1350,
+        "y": 2660,
         "wires": []
     },
     {
@@ -10942,8 +11802,8 @@
         "name": "HTTP Response",
         "statusCode": "",
         "headers": {},
-        "x": 1680,
-        "y": 3320,
+        "x": 1640,
+        "y": 2900,
         "wires": []
     },
     {
@@ -10960,8 +11820,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 940,
-        "y": 3240,
+        "x": 900,
+        "y": 2820,
         "wires": [
             [
                 "29629ba34b961c6f"
@@ -10979,8 +11839,8 @@
         "g": "393285469e400ec3",
         "mydb": "3ad98402733282af",
         "name": "Log Transaction",
-        "x": 1680,
-        "y": 3160,
+        "x": 1640,
+        "y": 2740,
         "wires": [
             []
         ]
@@ -10999,8 +11859,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1690,
-        "y": 3240,
+        "x": 1650,
+        "y": 2820,
         "wires": [
             [
                 "69bc2304c50b3033"
@@ -11021,8 +11881,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1390,
-        "y": 3240,
+        "x": 1350,
+        "y": 2820,
         "wires": [
             [
                 "d7e5110192926773"
@@ -11043,8 +11903,8 @@
         "g": "393285469e400ec3",
         "mydb": "3ad98402733282af",
         "name": "Log Bin Exports",
-        "x": 1960,
-        "y": 3240,
+        "x": 1920,
+        "y": 2820,
         "wires": [
             []
         ]
@@ -11063,8 +11923,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 900,
-        "y": 3000,
+        "x": 860,
+        "y": 2580,
         "wires": [
             [
                 "af0a0900f94f6b55"
@@ -11079,8 +11939,8 @@
         "g": "393285469e400ec3",
         "mydb": "3ad98402733282af",
         "name": "Cancel Transaction",
-        "x": 1390,
-        "y": 3000,
+        "x": 1350,
+        "y": 2580,
         "wires": [
             []
         ]
@@ -11093,8 +11953,8 @@
         "g": "393285469e400ec3",
         "name": "HTTP response status codes",
         "info": "400 Bad Request\n    The server cannot or will not process the request due to something that is perceived to be a client error (e.g., malformed request syntax, invalid request message framing, or deceptive request routing).\n\n403 Forbidden\n    The client does not have access rights to the content; that is, it is unauthorized, so the server is refusing to give the requested resource. Unlike 401 Unauthorized, the client's identity is known to the server.\n\n200 OK\n    The request succeeded\n\n504 Gateway Timeout\n    This error response is given when the server is acting as a gateway and cannot get a response in time.\n\n",
-        "x": 260,
-        "y": 3040,
+        "x": 220,
+        "y": 2620,
         "wires": []
     },
     {
@@ -11105,8 +11965,8 @@
         "g": "393285469e400ec3",
         "name": "Bin Data Export Flow - Updated with nodeRedTriggers.1 logic",
         "info": "",
-        "x": 370,
-        "y": 2980,
+        "x": 330,
+        "y": 2560,
         "wires": []
     },
     {
@@ -11126,8 +11986,8 @@
             "c5ecca589a16050b",
             "8a7bfe1781a57e4a"
         ],
-        "x": 1195,
-        "y": 3440,
+        "x": 1155,
+        "y": 3020,
         "wires": []
     },
     {
@@ -11140,8 +12000,8 @@
         "links": [
             "17c9c2fdf1ecefea"
         ],
-        "x": 185,
-        "y": 4040,
+        "x": 145,
+        "y": 3620,
         "wires": [
             [
                 "cc6f6c8bd02e2f6e",
@@ -11162,8 +12022,8 @@
         "links": [
             "17c9c2fdf1ecefea"
         ],
-        "x": 815,
-        "y": 4040,
+        "x": 775,
+        "y": 3620,
         "wires": [
             [
                 "3372d2b957764ac8",
@@ -11184,8 +12044,8 @@
         "links": [
             "17c9c2fdf1ecefea"
         ],
-        "x": 1465,
-        "y": 4040,
+        "x": 1425,
+        "y": 3620,
         "wires": [
             [
                 "bff3e6960c9aaf8f",
@@ -11206,8 +12066,8 @@
         "links": [
             "17c9c2fdf1ecefea"
         ],
-        "x": 185,
-        "y": 4360,
+        "x": 145,
+        "y": 3940,
         "wires": [
             [
                 "a6c097ad29017e66",
@@ -11228,8 +12088,8 @@
         "links": [
             "17c9c2fdf1ecefea"
         ],
-        "x": 815,
-        "y": 4360,
+        "x": 775,
+        "y": 3940,
         "wires": [
             [
                 "16eb2c81781cef1f",
@@ -11250,8 +12110,8 @@
         "links": [
             "17c9c2fdf1ecefea"
         ],
-        "x": 1475,
-        "y": 4360,
+        "x": 1435,
+        "y": 3940,
         "wires": [
             [
                 "ae6d127fd4d8e3e0",
@@ -11272,8 +12132,8 @@
         "links": [
             "17c9c2fdf1ecefea"
         ],
-        "x": 805,
-        "y": 4700,
+        "x": 765,
+        "y": 4280,
         "wires": [
             [
                 "426fb84c26449b9b",
@@ -11304,8 +12164,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 3920,
+        "x": 320,
+        "y": 3500,
         "wires": [
             [
                 "cf0f33ccca9fc060"
@@ -11331,8 +12191,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 3980,
+        "x": 320,
+        "y": 3560,
         "wires": [
             [
                 "e2a9c87dcc086795"
@@ -11358,8 +12218,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4040,
+        "x": 320,
+        "y": 3620,
         "wires": [
             [
                 "ae465d2e9d72d3af"
@@ -11385,8 +12245,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4100,
+        "x": 320,
+        "y": 3680,
         "wires": [
             [
                 "7717454096e71301"
@@ -11412,8 +12272,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4160,
+        "x": 320,
+        "y": 3740,
         "wires": [
             [
                 "f072a4f85421da41"
@@ -11430,8 +12290,8 @@
         "variable": "Bin_Data_IMPORT[1]",
         "program": "",
         "name": "Write Bin[1]",
-        "x": 700,
-        "y": 3920,
+        "x": 660,
+        "y": 3500,
         "wires": []
     },
     {
@@ -11444,8 +12304,8 @@
         "variable": "Bin_Data_IMPORT[2]",
         "program": "",
         "name": "Write Bin[2]",
-        "x": 700,
-        "y": 3980,
+        "x": 660,
+        "y": 3560,
         "wires": []
     },
     {
@@ -11458,8 +12318,8 @@
         "variable": "Bin_Data_IMPORT[3]",
         "program": "",
         "name": "Write Bin[3]",
-        "x": 700,
-        "y": 4040,
+        "x": 660,
+        "y": 3620,
         "wires": []
     },
     {
@@ -11472,8 +12332,8 @@
         "variable": "Bin_Data_IMPORT[4]",
         "program": "",
         "name": "Write Bin[4]",
-        "x": 700,
-        "y": 4100,
+        "x": 660,
+        "y": 3680,
         "wires": []
     },
     {
@@ -11486,8 +12346,8 @@
         "variable": "Bin_Data_IMPORT[5]",
         "program": "",
         "name": "Write Bin[5]",
-        "x": 700,
-        "y": 4160,
+        "x": 660,
+        "y": 3740,
         "wires": []
     },
     {
@@ -11509,8 +12369,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 3920,
+        "x": 960,
+        "y": 3500,
         "wires": [
             [
                 "d04e19b7179becee"
@@ -11536,8 +12396,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 3980,
+        "x": 960,
+        "y": 3560,
         "wires": [
             [
                 "b39713698fdeaa1e"
@@ -11563,8 +12423,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4040,
+        "x": 960,
+        "y": 3620,
         "wires": [
             [
                 "e097580ebef07d99"
@@ -11590,8 +12450,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4100,
+        "x": 960,
+        "y": 3680,
         "wires": [
             [
                 "d3b993d7a19c9581"
@@ -11617,8 +12477,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4160,
+        "x": 960,
+        "y": 3740,
         "wires": [
             [
                 "ab4a2d1a38d6eed5"
@@ -11635,8 +12495,8 @@
         "variable": "Bin_Data_IMPORT[6]",
         "program": "",
         "name": "Write Bin[6]",
-        "x": 1340,
-        "y": 3920,
+        "x": 1300,
+        "y": 3500,
         "wires": []
     },
     {
@@ -11649,8 +12509,8 @@
         "variable": "Bin_Data_IMPORT[7]",
         "program": "",
         "name": "Write Bin[7]",
-        "x": 1340,
-        "y": 3980,
+        "x": 1300,
+        "y": 3560,
         "wires": []
     },
     {
@@ -11663,8 +12523,8 @@
         "variable": "Bin_Data_IMPORT[8]",
         "program": "",
         "name": "Write Bin[8]",
-        "x": 1340,
-        "y": 4040,
+        "x": 1300,
+        "y": 3620,
         "wires": []
     },
     {
@@ -11677,8 +12537,8 @@
         "variable": "Bin_Data_IMPORT[9]",
         "program": "",
         "name": "Write Bin[9]",
-        "x": 1340,
-        "y": 4100,
+        "x": 1300,
+        "y": 3680,
         "wires": []
     },
     {
@@ -11691,8 +12551,8 @@
         "variable": "Bin_Data_IMPORT[10]",
         "program": "",
         "name": "Write Bin[10]",
-        "x": 1340,
-        "y": 4160,
+        "x": 1300,
+        "y": 3740,
         "wires": []
     },
     {
@@ -11714,8 +12574,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 3920,
+        "x": 1620,
+        "y": 3500,
         "wires": [
             [
                 "32723956b0a40622"
@@ -11741,8 +12601,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 3980,
+        "x": 1620,
+        "y": 3560,
         "wires": [
             [
                 "dada411c9b1d7dc4"
@@ -11768,8 +12628,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4040,
+        "x": 1620,
+        "y": 3620,
         "wires": [
             [
                 "1feff4b77395a281"
@@ -11795,8 +12655,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4100,
+        "x": 1620,
+        "y": 3680,
         "wires": [
             [
                 "d0a6120be4514516"
@@ -11822,8 +12682,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4160,
+        "x": 1620,
+        "y": 3740,
         "wires": [
             [
                 "33b8d0c7441c12a8"
@@ -11840,8 +12700,8 @@
         "variable": "Bin_Data_IMPORT[11]",
         "program": "",
         "name": "Write Bin[11]",
-        "x": 1980,
-        "y": 3920,
+        "x": 1940,
+        "y": 3500,
         "wires": []
     },
     {
@@ -11854,8 +12714,8 @@
         "variable": "Bin_Data_IMPORT[12]",
         "program": "",
         "name": "Write Bin[12]",
-        "x": 1980,
-        "y": 3980,
+        "x": 1940,
+        "y": 3560,
         "wires": []
     },
     {
@@ -11868,8 +12728,8 @@
         "variable": "Bin_Data_IMPORT[13]",
         "program": "",
         "name": "Write Bin[13]",
-        "x": 1980,
-        "y": 4040,
+        "x": 1940,
+        "y": 3620,
         "wires": []
     },
     {
@@ -11882,8 +12742,8 @@
         "variable": "Bin_Data_IMPORT[14]",
         "program": "",
         "name": "Write Bin[14]",
-        "x": 1980,
-        "y": 4100,
+        "x": 1940,
+        "y": 3680,
         "wires": []
     },
     {
@@ -11896,8 +12756,8 @@
         "variable": "Bin_Data_IMPORT[15]",
         "program": "",
         "name": "Write Bin[15]",
-        "x": 1980,
-        "y": 4160,
+        "x": 1940,
+        "y": 3740,
         "wires": []
     },
     {
@@ -11919,8 +12779,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4240,
+        "x": 320,
+        "y": 3820,
         "wires": [
             [
                 "37cf7e36986e1039"
@@ -11946,8 +12806,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4300,
+        "x": 320,
+        "y": 3880,
         "wires": [
             [
                 "b5254fa7535c7465"
@@ -11973,8 +12833,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4360,
+        "x": 320,
+        "y": 3940,
         "wires": [
             [
                 "4cfb056337b17395"
@@ -12000,8 +12860,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4420,
+        "x": 320,
+        "y": 4000,
         "wires": [
             [
                 "82a63d11b8fb2252"
@@ -12027,8 +12887,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 360,
-        "y": 4480,
+        "x": 320,
+        "y": 4060,
         "wires": [
             [
                 "0a4780208533400d"
@@ -12045,8 +12905,8 @@
         "variable": "Bin_Data_IMPORT[16]",
         "program": "",
         "name": "Write Bin[16]",
-        "x": 700,
-        "y": 4240,
+        "x": 660,
+        "y": 3820,
         "wires": []
     },
     {
@@ -12059,8 +12919,8 @@
         "variable": "Bin_Data_IMPORT[17]",
         "program": "",
         "name": "Write Bin[17]",
-        "x": 700,
-        "y": 4300,
+        "x": 660,
+        "y": 3880,
         "wires": []
     },
     {
@@ -12073,8 +12933,8 @@
         "variable": "Bin_Data_IMPORT[18]",
         "program": "",
         "name": "Write Bin[18]",
-        "x": 700,
-        "y": 4360,
+        "x": 660,
+        "y": 3940,
         "wires": []
     },
     {
@@ -12087,8 +12947,8 @@
         "variable": "Bin_Data_IMPORT[19]",
         "program": "",
         "name": "Write Bin[19]",
-        "x": 700,
-        "y": 4420,
+        "x": 660,
+        "y": 4000,
         "wires": []
     },
     {
@@ -12101,8 +12961,8 @@
         "variable": "Bin_Data_IMPORT[20]",
         "program": "",
         "name": "Write Bin[20]",
-        "x": 700,
-        "y": 4480,
+        "x": 660,
+        "y": 4060,
         "wires": []
     },
     {
@@ -12124,8 +12984,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4240,
+        "x": 960,
+        "y": 3820,
         "wires": [
             [
                 "f2907097ca10105b"
@@ -12151,8 +13011,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4300,
+        "x": 960,
+        "y": 3880,
         "wires": [
             [
                 "1795e268fc6dcb2f"
@@ -12178,8 +13038,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4360,
+        "x": 960,
+        "y": 3940,
         "wires": [
             [
                 "456d6d45b7607f72"
@@ -12205,8 +13065,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4420,
+        "x": 960,
+        "y": 4000,
         "wires": [
             [
                 "d3cb65d01503d001"
@@ -12232,8 +13092,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4480,
+        "x": 960,
+        "y": 4060,
         "wires": [
             [
                 "909d0a73f29a711d"
@@ -12250,8 +13110,8 @@
         "variable": "Bin_Data_IMPORT[21]",
         "program": "",
         "name": "Write Bin[21]",
-        "x": 1340,
-        "y": 4240,
+        "x": 1300,
+        "y": 3820,
         "wires": []
     },
     {
@@ -12264,8 +13124,8 @@
         "variable": "Bin_Data_IMPORT[22]",
         "program": "",
         "name": "Write Bin[22]",
-        "x": 1340,
-        "y": 4300,
+        "x": 1300,
+        "y": 3880,
         "wires": []
     },
     {
@@ -12278,8 +13138,8 @@
         "variable": "Bin_Data_IMPORT[23]",
         "program": "",
         "name": "Write Bin[23]",
-        "x": 1340,
-        "y": 4360,
+        "x": 1300,
+        "y": 3940,
         "wires": []
     },
     {
@@ -12292,8 +13152,8 @@
         "variable": "Bin_Data_IMPORT[24]",
         "program": "",
         "name": "Write Bin[24]",
-        "x": 1340,
-        "y": 4420,
+        "x": 1300,
+        "y": 4000,
         "wires": []
     },
     {
@@ -12306,8 +13166,8 @@
         "variable": "Bin_Data_IMPORT[25]",
         "program": "",
         "name": "Write Bin[25]",
-        "x": 1340,
-        "y": 4480,
+        "x": 1300,
+        "y": 4060,
         "wires": []
     },
     {
@@ -12329,8 +13189,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4240,
+        "x": 1620,
+        "y": 3820,
         "wires": [
             [
                 "0d972d2e6bb0adf2"
@@ -12356,8 +13216,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4300,
+        "x": 1620,
+        "y": 3880,
         "wires": [
             [
                 "6fbbfe90ff44003c"
@@ -12383,8 +13243,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4360,
+        "x": 1620,
+        "y": 3940,
         "wires": [
             [
                 "3681660a52dbd4df"
@@ -12410,8 +13270,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4420,
+        "x": 1620,
+        "y": 4000,
         "wires": [
             [
                 "045c0272c3a65547"
@@ -12437,8 +13297,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1660,
-        "y": 4480,
+        "x": 1620,
+        "y": 4060,
         "wires": [
             [
                 "3e8bc151cc1ccf49"
@@ -12455,8 +13315,8 @@
         "variable": "Bin_Data_IMPORT[26]",
         "program": "",
         "name": "Write Bin[26]",
-        "x": 1980,
-        "y": 4240,
+        "x": 1940,
+        "y": 3820,
         "wires": []
     },
     {
@@ -12469,8 +13329,8 @@
         "variable": "Bin_Data_IMPORT[27]",
         "program": "",
         "name": "Write Bin[27]",
-        "x": 1980,
-        "y": 4300,
+        "x": 1940,
+        "y": 3880,
         "wires": []
     },
     {
@@ -12483,8 +13343,8 @@
         "variable": "Bin_Data_IMPORT[28]",
         "program": "",
         "name": "Write Bin[28]",
-        "x": 1980,
-        "y": 4360,
+        "x": 1940,
+        "y": 3940,
         "wires": []
     },
     {
@@ -12497,8 +13357,8 @@
         "variable": "Bin_Data_IMPORT[29]",
         "program": "",
         "name": "Write Bin[29]",
-        "x": 1980,
-        "y": 4420,
+        "x": 1940,
+        "y": 4000,
         "wires": []
     },
     {
@@ -12511,8 +13371,8 @@
         "variable": "Bin_Data_IMPORT[30]",
         "program": "",
         "name": "Write Bin[30]",
-        "x": 1980,
-        "y": 4480,
+        "x": 1940,
+        "y": 4060,
         "wires": []
     },
     {
@@ -12534,8 +13394,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4560,
+        "x": 960,
+        "y": 4140,
         "wires": [
             [
                 "e715a04b5eb75d05"
@@ -12561,8 +13421,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4620,
+        "x": 960,
+        "y": 4200,
         "wires": [
             [
                 "99ebdce84ddceb57"
@@ -12588,8 +13448,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4680,
+        "x": 960,
+        "y": 4260,
         "wires": [
             [
                 "ec6d3cf798d77e99"
@@ -12615,8 +13475,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4740,
+        "x": 960,
+        "y": 4320,
         "wires": [
             [
                 "cb2079f5dee0a6ac"
@@ -12642,8 +13502,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4800,
+        "x": 960,
+        "y": 4380,
         "wires": [
             [
                 "dcb0bef92e478198"
@@ -12669,8 +13529,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1000,
-        "y": 4860,
+        "x": 960,
+        "y": 4440,
         "wires": [
             [
                 "11eaafe4201b6875"
@@ -12687,8 +13547,8 @@
         "variable": "Bin_Data_IMPORT[31]",
         "program": "",
         "name": "Write Bin[31]",
-        "x": 1340,
-        "y": 4560,
+        "x": 1300,
+        "y": 4140,
         "wires": []
     },
     {
@@ -12701,8 +13561,8 @@
         "variable": "Bin_Data_IMPORT[32]",
         "program": "",
         "name": "Write Bin[32]",
-        "x": 1340,
-        "y": 4620,
+        "x": 1300,
+        "y": 4200,
         "wires": []
     },
     {
@@ -12715,8 +13575,8 @@
         "variable": "Bin_Data_IMPORT[33]",
         "program": "",
         "name": "Write Bin[33]",
-        "x": 1340,
-        "y": 4680,
+        "x": 1300,
+        "y": 4260,
         "wires": []
     },
     {
@@ -12729,8 +13589,8 @@
         "variable": "Bin_Data_IMPORT[34]",
         "program": "",
         "name": "Write Bin[34]",
-        "x": 1340,
-        "y": 4740,
+        "x": 1300,
+        "y": 4320,
         "wires": []
     },
     {
@@ -12743,8 +13603,8 @@
         "variable": "Bin_Data_IMPORT[35]",
         "program": "",
         "name": "Write Bin[35]",
-        "x": 1340,
-        "y": 4800,
+        "x": 1300,
+        "y": 4380,
         "wires": []
     },
     {
@@ -12757,8 +13617,8 @@
         "variable": "Bin_Data_IMPORT[36]",
         "program": "",
         "name": "Write Bin[36]",
-        "x": 1340,
-        "y": 4860,
+        "x": 1300,
+        "y": 4440,
         "wires": []
     },
     {
@@ -12772,8 +13632,8 @@
         "method": "post",
         "upload": false,
         "swaggerDoc": "",
-        "x": 210,
-        "y": 3620,
+        "x": 170,
+        "y": 3200,
         "wires": [
             [
                 "6248a86f7605ae44"
@@ -12794,8 +13654,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 560,
-        "y": 3620,
+        "x": 520,
+        "y": 3200,
         "wires": [
             [
                 "ef02b1b443c82482",
@@ -12820,8 +13680,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 930,
-        "y": 3560,
+        "x": 890,
+        "y": 3140,
         "wires": [
             [
                 "17c9c2fdf1ecefea"
@@ -12845,8 +13705,8 @@
         "g": "f415dc7f255abcb2",
         "mydb": "3ad98402733282af",
         "name": "Log Bin Imports",
-        "x": 1260,
-        "y": 3760,
+        "x": 1220,
+        "y": 3340,
         "wires": [
             [
                 "35487d64e53ee957"
@@ -12862,8 +13722,8 @@
         "name": "Success Response",
         "statusCode": "",
         "headers": {},
-        "x": 1270,
-        "y": 3500,
+        "x": 1230,
+        "y": 3080,
         "wires": []
     },
     {
@@ -12880,8 +13740,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 940,
-        "y": 3700,
+        "x": 900,
+        "y": 3280,
         "wires": [
             [
                 "68d3c7a343d8639d"
@@ -12900,8 +13760,8 @@
         "name": "Error Response",
         "statusCode": "",
         "headers": {},
-        "x": 920,
-        "y": 3780,
+        "x": 880,
+        "y": 3360,
         "wires": []
     },
     {
@@ -12912,8 +13772,8 @@
         "g": "f415dc7f255abcb2",
         "name": "Bin Data Import Flow",
         "info": "",
-        "x": 240,
-        "y": 3460,
+        "x": 200,
+        "y": 3040,
         "wires": []
     },
     {
@@ -12933,8 +13793,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1250,
-        "y": 3560,
+        "x": 1210,
+        "y": 3140,
         "wires": [
             [
                 "fda9011182a071e8"
@@ -12951,8 +13811,8 @@
         "variable": "User_Tablet_Admin",
         "program": "",
         "name": "Write UserAdmin",
-        "x": 1510,
-        "y": 3560,
+        "x": 1470,
+        "y": 3140,
         "wires": []
     },
     {
@@ -12965,8 +13825,8 @@
         "variable": "nodeRedTriggers.10",
         "program": "",
         "name": "nodeRedTriggers.10",
-        "x": 1280,
-        "y": 3640,
+        "x": 1240,
+        "y": 3220,
         "wires": []
     },
     {
@@ -12977,8 +13837,8 @@
         "g": "f415dc7f255abcb2",
         "mydb": "3ad98402733282af",
         "name": "Log Transaction",
-        "x": 1260,
-        "y": 3700,
+        "x": 1220,
+        "y": 3280,
         "wires": [
             []
         ]
@@ -12997,8 +13857,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1530,
-        "y": 3760,
+        "x": 1490,
+        "y": 3340,
         "wires": [
             [
                 "6886449910c3dacf"
@@ -13013,8 +13873,8 @@
         "g": "f415dc7f255abcb2",
         "mydb": "3ad98402733282af",
         "name": "Get Bin Changes",
-        "x": 1790,
-        "y": 3760,
+        "x": 1750,
+        "y": 3340,
         "wires": [
             [
                 "cd6e1425e55b8794"
@@ -13035,8 +13895,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2080,
-        "y": 3760,
+        "x": 2040,
+        "y": 3340,
         "wires": [
             [
                 "3b4df2ad48df2a79"
@@ -13056,8 +13916,8 @@
         "name": "Success Response",
         "statusCode": "",
         "headers": {},
-        "x": 2130,
-        "y": 3680,
+        "x": 2090,
+        "y": 3260,
         "wires": []
     },
     {
@@ -13074,8 +13934,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2450,
-        "y": 3760,
+        "x": 2410,
+        "y": 3340,
         "wires": [
             [
                 "ee5cb3486404dd4d"
@@ -13122,8 +13982,8 @@
         "variable": "BinIDBeforeAfter[0]",
         "program": "",
         "name": "Write BinIDBeforeAfter[0]",
-        "x": 2830,
-        "y": 3460,
+        "x": 2790,
+        "y": 3040,
         "wires": []
     },
     {
@@ -13136,8 +13996,8 @@
         "variable": "BinIDBeforeAfter[1]",
         "program": "",
         "name": "Write BinIDBeforeAfter[1]",
-        "x": 2830,
-        "y": 3520,
+        "x": 2790,
+        "y": 3100,
         "wires": []
     },
     {
@@ -13150,8 +14010,8 @@
         "variable": "BinIDBeforeAfter[2]",
         "program": "",
         "name": "Write BinIDBeforeAfter[2]",
-        "x": 2830,
-        "y": 3580,
+        "x": 2790,
+        "y": 3160,
         "wires": []
     },
     {
@@ -13164,8 +14024,8 @@
         "variable": "BinIDBeforeAfter[3]",
         "program": "",
         "name": "Write BinIDBeforeAfter[3]",
-        "x": 2830,
-        "y": 3640,
+        "x": 2790,
+        "y": 3220,
         "wires": []
     },
     {
@@ -13178,8 +14038,8 @@
         "variable": "BinIDBeforeAfter[4]",
         "program": "",
         "name": "Write BinIDBeforeAfter[4]",
-        "x": 2830,
-        "y": 3700,
+        "x": 2790,
+        "y": 3280,
         "wires": []
     },
     {
@@ -13192,8 +14052,8 @@
         "variable": "BinIDBeforeAfter[5]",
         "program": "",
         "name": "Write BinIDBeforeAfter[5]",
-        "x": 2830,
-        "y": 3760,
+        "x": 2790,
+        "y": 3340,
         "wires": []
     },
     {
@@ -13206,8 +14066,8 @@
         "variable": "BinIDBeforeAfter[6]",
         "program": "",
         "name": "Write BinIDBeforeAfter[6]",
-        "x": 2830,
-        "y": 3820,
+        "x": 2790,
+        "y": 3400,
         "wires": []
     },
     {
@@ -13220,8 +14080,8 @@
         "variable": "BinIDBeforeAfter[7]",
         "program": "",
         "name": "Write BinIDBeforeAfter[7]",
-        "x": 2830,
-        "y": 3880,
+        "x": 2790,
+        "y": 3460,
         "wires": []
     },
     {
@@ -13234,8 +14094,8 @@
         "variable": "BinIDBeforeAfter[8]",
         "program": "",
         "name": "Write BinIDBeforeAfter[8]",
-        "x": 2830,
-        "y": 3940,
+        "x": 2790,
+        "y": 3520,
         "wires": []
     },
     {
@@ -13248,8 +14108,8 @@
         "variable": "BinIDBeforeAfter[9]",
         "program": "",
         "name": "Write BinIDBeforeAfter[9]",
-        "x": 2830,
-        "y": 4000,
+        "x": 2790,
+        "y": 3580,
         "wires": []
     },
     {
@@ -13262,8 +14122,8 @@
         "variable": "BinIDBeforeAfter[10]",
         "program": "",
         "name": "Write BinIDBeforeAfter[10]",
-        "x": 2840,
-        "y": 4060,
+        "x": 2800,
+        "y": 3640,
         "wires": []
     },
     {
@@ -13280,8 +14140,8 @@
         "complete": "false",
         "statusVal": "",
         "statusType": "auto",
-        "x": 2160,
-        "y": 3840,
+        "x": 2120,
+        "y": 3420,
         "wires": []
     },
     {
@@ -13302,8 +14162,8 @@
         "topic": "",
         "payload": "true",
         "payloadType": "bool",
-        "x": 220,
-        "y": 5040,
+        "x": 180,
+        "y": 4620,
         "wires": [
             [
                 "bd9d3d9eae9417e2"
@@ -13323,8 +14183,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 440,
-        "y": 5040,
+        "x": 400,
+        "y": 4620,
         "wires": [
             [
                 "d45f1e5215a2f89f"
@@ -13340,8 +14200,8 @@
         "variable": "nodeRedTriggers.31",
         "program": "",
         "name": "Node-Red HeartBeat",
-        "x": 680,
-        "y": 5040,
+        "x": 640,
+        "y": 4620,
         "wires": []
     },
     {
@@ -13362,8 +14222,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "str",
-        "x": 220,
-        "y": 5140,
+        "x": 180,
+        "y": 4720,
         "wires": [
             [
                 "set_query"
@@ -13378,8 +14238,8 @@
         "name": "Set Health Check Query",
         "func": "msg.topic = 'SELECT 1';\nreturn msg;",
         "outputs": 1,
-        "x": 430,
-        "y": 5140,
+        "x": 390,
+        "y": 4720,
         "wires": [
             [
                 "mysql_hb"
@@ -13393,8 +14253,8 @@
         "g": "ec24ce525f9ff1c0",
         "mydb": "3ad98402733282af",
         "name": "MySQL HeartBeat",
-        "x": 660,
-        "y": 5140,
+        "x": 620,
+        "y": 4720,
         "wires": [
             [
                 "on_success"
@@ -13409,8 +14269,8 @@
         "name": "DB OK → 0",
         "func": "msg.payload = false;\nreturn msg;",
         "outputs": 1,
-        "x": 850,
-        "y": 5140,
+        "x": 810,
+        "y": 4720,
         "wires": [
             [
                 "plc_db_status"
@@ -13427,8 +14287,8 @@
             "mysql_hb"
         ],
         "uncaught": false,
-        "x": 660,
-        "y": 5200,
+        "x": 620,
+        "y": 4780,
         "wires": [
             [
                 "on_error"
@@ -13443,8 +14303,8 @@
         "name": "DB Down → 1",
         "func": "node.warn('MySQL connection failed: ' + msg.error.message);\nmsg.payload = true;\nreturn msg;",
         "outputs": 1,
-        "x": 850,
-        "y": 5200,
+        "x": 810,
+        "y": 4780,
         "wires": [
             [
                 "plc_db_status"
@@ -13460,8 +14320,8 @@
         "variable": "nodeRedTriggers.30",
         "program": "",
         "name": "DB Status → PLC",
-        "x": 1070,
-        "y": 5160,
+        "x": 1030,
+        "y": 4740,
         "wires": []
     },
     {
@@ -13479,8 +14339,8 @@
         "includeTimestamp": false,
         "addErrorOutput": false,
         "outputs": 1,
-        "x": 280,
-        "y": 2200,
+        "x": 220,
+        "y": 1840,
         "wires": [
             [
                 "348e9b3c865345a4"
@@ -13504,8 +14364,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 550,
-        "y": 2200,
+        "x": 490,
+        "y": 1840,
         "wires": [
             [
                 "8d93b54b0459092c",
@@ -13527,8 +14387,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 2160,
+        "x": 1010,
+        "y": 1800,
         "wires": [
             [
                 "e4afe7a76a818902"
@@ -13550,8 +14410,8 @@
         "includeTimestamp": false,
         "addErrorOutput": false,
         "outputs": 1,
-        "x": 200,
-        "y": 2700,
+        "x": 140,
+        "y": 2340,
         "wires": [
             [
                 "e6f4ca386f091e5f",
@@ -13567,8 +14427,8 @@
         "g": "90f349e5df2c52fe",
         "mydb": "3ad98402733282af",
         "name": "MySQL – Insert/Map",
-        "x": 1360,
-        "y": 2160,
+        "x": 1300,
+        "y": 1800,
         "wires": [
             [
                 "ea6a07aacb3045c6",
@@ -13590,8 +14450,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 770,
-        "y": 2700,
+        "x": 710,
+        "y": 2340,
         "wires": [
             [
                 "e2f0550b893c91db"
@@ -13606,8 +14466,8 @@
         "g": "90f349e5df2c52fe",
         "mydb": "3ad98402733282af",
         "name": "MySQL – CreateTables (Manual)",
-        "x": 770,
-        "y": 2620,
+        "x": 710,
+        "y": 2260,
         "wires": [
             [
                 "138537fcc6dfb1fd"
@@ -13624,8 +14484,8 @@
         "variable": "IQ_LogBuffer_HOA",
         "program": "",
         "name": "Reset HOA to 0",
-        "x": 1280,
-        "y": 2620,
+        "x": 1220,
+        "y": 2260,
         "wires": []
     },
     {
@@ -13649,8 +14509,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1830,
-        "y": 2260,
+        "x": 1770,
+        "y": 1900,
         "wires": [
             [
                 "4e66566bde3a1d4f"
@@ -13671,8 +14531,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 2030,
-        "y": 2080,
+        "x": 1970,
+        "y": 1720,
         "wires": [
             [
                 "c1d96612686b4bbb"
@@ -13698,8 +14558,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 1630,
-        "y": 2080,
+        "x": 1570,
+        "y": 1720,
         "wires": [
             [
                 "7da3491e621d05f2"
@@ -13714,8 +14574,8 @@
         "g": "90f349e5df2c52fe",
         "mydb": "3ad98402733282af",
         "name": "MySQL – CreateTables (Auto)",
-        "x": 2390,
-        "y": 2080,
+        "x": 2330,
+        "y": 1720,
         "wires": [
             []
         ]
@@ -13734,8 +14594,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1060,
-        "y": 1960,
+        "x": 1000,
+        "y": 1600,
         "wires": [
             [
                 "a7d1a59070f5becf"
@@ -13763,8 +14623,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1780,
-        "y": 1960,
+        "x": 1720,
+        "y": 1600,
         "wires": [
             []
         ]
@@ -13777,8 +14637,8 @@
         "g": "90f349e5df2c52fe",
         "mydb": "3ad98402733282af",
         "name": "MySQL – TagNames",
-        "x": 1443,
-        "y": 1960,
+        "x": 1383,
+        "y": 1600,
         "wires": [
             [
                 "ed9bc63f224d4171"
@@ -13799,8 +14659,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1070,
-        "y": 1900,
+        "x": 1010,
+        "y": 1540,
         "wires": [
             [
                 "0e2805c261e879c3"
@@ -13828,8 +14688,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1770,
-        "y": 1900,
+        "x": 1710,
+        "y": 1540,
         "wires": [
             []
         ]
@@ -13855,8 +14715,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1070,
-        "y": 2620,
+        "x": 1010,
+        "y": 2260,
         "wires": [
             [
                 "ade1835664958b56"
@@ -13884,8 +14744,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 450,
-        "y": 2760,
+        "x": 390,
+        "y": 2400,
         "wires": [
             []
         ]
@@ -13898,8 +14758,8 @@
         "g": "90f349e5df2c52fe",
         "name": "READ BEFORE adding a new application",
         "info": "\nTo ensure this works generically across all applications, please follow these rules:\n\n1. Supported data types: DINT, STRING, and REAL only.\n\n2. UDT instance names must exactly match those used in the \"Build INSERT or Mapping Query\" function node — capitalisation matters.\n\n3. TagName formatting rules:\n\n   • Multiple UDT instances → \"TagName.UDTInstance\"\n     Example: AGV_Current.GantryNo\n\n   • Avoid unsupported characters in TagName before sending.\n     The flow auto-replaces them with '__', but cleaner names = fewer issues.\n\n4. Unsupported characters for MySQL identifiers (without backtick quoting):\n   . ! @ # $ % ^ & * ( ) - + = { } [ ] ; : \" ' < > , . ? / \\ | ~ and whitespace.\n\n5. Table names starting with a digit are auto-prefixed with '_'.\n",
-        "x": 360,
-        "y": 1900,
+        "x": 280,
+        "y": 1560,
         "wires": []
     },
     {
@@ -13910,8 +14770,8 @@
         "g": "90f349e5df2c52fe",
         "name": "PLC Data Logger Flow",
         "info": "\n                              Read PLC: IQ_LogBuffer[0]\n                                        │\n                                        ↓\n                              Check if Flag = TRUE\n                                        │\n                    ┌───────────────────┴───────────────────┐\n                    │                                       │\n                Flag TRUE                               Flag FALSE\n                    │                                       │\n                    ↓                                   (Do Nothing)\n          Load TagName & Tables Lists\n                    │\n          ┌─────────┴─────────┐\n          │                   │\n    Show Tables         Select TagName\n          │                   │\n    Store in Flow       Store in Flow\n          │                   │\n          └─────────┬─────────┘\n                    ↓\n        Extract & Validate Tag Data\n        (Value_INT, Value_REAL, Value_STR)\n                    │\n                    ↓\n        Check if Tag & Table Exist\n                    │\n        ┌───────────┴───────────┐\n        │                       │\n    EXISTS                  NOT EXISTS\n        │                       │\n        ↓                       ↓\nInsert INTO [table]    CALL InsertIntoTagTableMapping()\n (Direct Insert)       (Creates mapping entry)\n        │                       │\n        └───────────┬───────────┘\n                    ↓\n          Write FALSE to PLC Flag\n                    │\n                    ↓\n                SUCCESS !!!\n\n\n                        ┌─────────────────────────┐\n                        │  Manual/Auto Mode (HOA) │\n                        └─────────────────────────┘\n                                    │\n                    ┌───────────────┴───────────────┐\n                    │                               │\n            HOA = 1 (Manual)                  HOA = 2 (Auto)\n                    │                               │\n                    ↓                               ↓\n    CALL GenericCreateTablesFromMapping()  CALL GenericCreateTablesFromMapping()\n              (After Flag TRUE)              (After successful INSERT)\n                    │                               │\n              Reset HOA to 0                        │\n                    │                               │\n                    └───────────────┬───────────────┘\n                                    ↓\n                              SUCCESS !!!",
-        "x": 300,
-        "y": 1960,
+        "x": 240,
+        "y": 1600,
         "wires": []
     },
     {
@@ -13922,8 +14782,8 @@
         "g": "90f349e5df2c52fe",
         "mydb": "3ad98402733282af",
         "name": "MySQL – ShowTables",
-        "x": 1440,
-        "y": 1900,
+        "x": 1380,
+        "y": 1540,
         "wires": [
             [
                 "476d53fd15c60e55"
@@ -13939,8 +14799,8 @@
         "name": "Catch All Errors IN the same group",
         "scope": "group",
         "uncaught": false,
-        "x": 360,
-        "y": 2360,
+        "x": 300,
+        "y": 2000,
         "wires": [
             [
                 "ec5613e47cd68f55"
@@ -13968,8 +14828,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 700,
-        "y": 2360,
+        "x": 640,
+        "y": 2000,
         "wires": [
             [
                 "67a92792b91d993a"
@@ -13995,8 +14855,8 @@
         "checkall": "true",
         "repair": false,
         "outputs": 1,
-        "x": 450,
-        "y": 2700,
+        "x": 390,
+        "y": 2340,
         "wires": [
             [
                 "dcb35f860dbdd7ce"
@@ -14017,8 +14877,8 @@
         "initialize": "if (flow.get('insertCount') === undefined) {\n    flow.set('insertCount', 0);\n}",
         "finalize": "",
         "libs": [],
-        "x": 2050,
-        "y": 2260,
+        "x": 1990,
+        "y": 1900,
         "wires": [
             [
                 "b2edd38afb794a48",
@@ -14056,8 +14916,8 @@
         "icon": "",
         "iconPosition": "left",
         "iconInnerPosition": "inside",
-        "x": 2330,
-        "y": 2320,
+        "x": 2270,
+        "y": 1960,
         "wires": [
             []
         ]
@@ -14081,8 +14941,8 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 740,
-        "y": 1920,
+        "x": 680,
+        "y": 1560,
         "wires": [
             [
                 "2e4c52de9e1ec71d",
@@ -14104,8 +14964,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 770,
-        "y": 2160,
+        "x": 710,
+        "y": 1800,
         "wires": [
             [
                 "a5e55ed2cbc05acd"
@@ -14126,8 +14986,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1630,
-        "y": 2260,
+        "x": 1570,
+        "y": 1900,
         "wires": [
             [
                 "2929ee10fb014d41"
@@ -14144,8 +15004,8 @@
         "variable": "IQ_LogBuffer_NR.Flag",
         "program": "",
         "name": "",
-        "x": 2340,
-        "y": 2240,
+        "x": 2280,
+        "y": 1880,
         "wires": []
     },
     {
@@ -14158,8 +15018,8 @@
         "variable": "NodeRed_Flag",
         "program": "",
         "name": "",
-        "x": 2320,
-        "y": 2280,
+        "x": 2260,
+        "y": 1920,
         "wires": []
     },
     {
@@ -14172,8 +15032,8 @@
         "variable": "NodeRed_Flag",
         "program": "",
         "name": "",
-        "x": 1160,
-        "y": 2260,
+        "x": 1100,
+        "y": 1900,
         "wires": []
     },
     {
@@ -14197,8 +15057,8 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 750,
-        "y": 2260,
+        "x": 690,
+        "y": 1900,
         "wires": [
             [
                 "67a92792b91d993a"
@@ -14219,8 +15079,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 420,
-        "y": 2060,
+        "x": 360,
+        "y": 1700,
         "wires": [
             [
                 "d3f097d9ad115e25"
@@ -14240,8 +15100,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 250,
-        "y": 2500,
+        "x": 190,
+        "y": 2140,
         "wires": [
             [
                 "60f72b5ac3309fbf"
@@ -14262,8 +15122,8 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 500,
-        "y": 2500,
+        "x": 440,
+        "y": 2140,
         "wires": [
             []
         ]
@@ -14281,8 +15141,8 @@
         "once": false,
         "onceDelay": 0.1,
         "topic": "",
-        "x": 230,
-        "y": 2580,
+        "x": 170,
+        "y": 2220,
         "wires": [
             [
                 "bf7c60f88b3928ac"
@@ -14303,39 +15163,118 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 480,
-        "y": 2580,
+        "x": 420,
+        "y": 2220,
         "wires": [
             []
         ]
     },
     {
-        "id": "0beba35e73221cae",
-        "type": "eth-ip in",
+        "id": "3abd4b4dbf161d4f",
+        "type": "catch",
         "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
-        "endpoint": "a959344900b4c2ae",
-        "mode": "all",
-        "variable": "",
-        "program": "",
-        "name": "Read Numeric Tag Name",
-        "gatherMetrics": false,
-        "includeTimestamp": true,
-        "addErrorOutput": false,
-        "outputs": 1,
-        "x": 230,
-        "y": 180,
+        "name": "Catch MySQL Insert Errors",
+        "scope": [
+            "9277197bc36a6c8e",
+            "1f1e76a6c1fd2325",
+            "12d712874e140530",
+            "524fefa805087378"
+        ],
+        "uncaught": false,
+        "x": 1550,
+        "y": 600,
         "wires": [
             [
-                "032611c16dcb14d0"
+                "e75f06872dc6341d"
             ]
         ]
     },
     {
-        "id": "step1_hoa_read",
+        "id": "e75f06872dc6341d",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "name": "Retry on Deadlock",
+        "func": "const MAX_RETRIES = 3;\nconst BASE_DELAY_MS = 100;\nconst JITTER_MS = 300;\n\n// MySQL error classification\nconst err = msg.error || {};\nconst errCode = err.source?.errno ?? err.code;\nconst errMessage = err.message || '';\nconst isDeadlock = errCode === 1213 || errCode === 'ER_LOCK_DEADLOCK' || /deadlock/i.test(errMessage);\nconst isLockTimeout = errCode === 1205 || errCode === 'ER_LOCK_WAIT_TIMEOUT';\n\nconst sourceName = err.source?.name || 'unknown';\nconst sourceId = err.source?.id;\n\nif (!isDeadlock && !isLockTimeout) {\n    node.warn(`Non-retriable MySQL error from ${sourceName}: ${errMessage}`);\n    return null;\n}\n\nconst retryCount = msg._retryCount || 0;\nif (retryCount >= MAX_RETRIES) {\n    node.error(`${isDeadlock ? 'Deadlock' : 'Lock timeout'} retries exhausted on ${sourceName} after ${MAX_RETRIES} attempts; batch dropped (RDindex NOT advanced)`);\n    return null;\n}\n\n// Route by source node ID — keep this map in sync with the Catch node's scope list\nconst routes = {\n    'f77b522b90d30846': 0,  // INSERT log_records (Numeric)\n    '94ab2ce6f5600dc0': 1,  // INSERT tag_history_catchall (Numeric)\n    '310f4f50aeb051dc': 2,  // INSERT log_records (String)\n    '5037f938d1e77d3e': 3   // INSERT tag_history_catchall (String)\n};\nconst outputIndex = routes[sourceId];\nif (outputIndex === undefined) {\n    node.warn(`Retry function got error from unmapped source ${sourceId} (${sourceName}); dropping`);\n    return null;\n}\n\nmsg._retryCount = retryCount + 1;\nconst delay = BASE_DELAY_MS + Math.floor(Math.random() * JITTER_MS);\nnode.warn(`${isDeadlock ? 'Deadlock' : 'Lock timeout'} on ${sourceName}, retry ${msg._retryCount}/${MAX_RETRIES} in ${delay}ms`);\n\n// Clear the error so the next attempt doesn't carry it\ndelete msg.error;\n\nsetTimeout(() => {\n    const out = [null, null, null, null];\n    out[outputIndex] = msg;\n    node.send(out);\n}, delay);\n\nreturn null;",
+        "outputs": 4,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1870,
+        "y": 580,
+        "wires": [
+            [
+                "755ec6a561c6446d"
+            ],
+            [
+                "8e1db23eb1f2e024"
+            ],
+            [
+                "0f0c2d7ac8997ff8"
+            ],
+            [
+                "60ccc05553e52d13"
+            ]
+        ]
+    },
+    {
+        "id": "755ec6a561c6446d",
+        "type": "link out",
+        "z": "2a81416e0ebc91b9",
+        "name": "link out 4",
+        "mode": "link",
+        "links": [
+            "49f8a3220dda7139"
+        ],
+        "x": 2135,
+        "y": 480,
+        "wires": []
+    },
+    {
+        "id": "8e1db23eb1f2e024",
+        "type": "link out",
+        "z": "2a81416e0ebc91b9",
+        "name": "link out 5",
+        "mode": "link",
+        "links": [
+            "943752fd54d99017"
+        ],
+        "x": 2135,
+        "y": 540,
+        "wires": []
+    },
+    {
+        "id": "0f0c2d7ac8997ff8",
+        "type": "link out",
+        "z": "2a81416e0ebc91b9",
+        "name": "link out 6",
+        "mode": "link",
+        "links": [
+            "aec258bce3b1d3ca"
+        ],
+        "x": 2135,
+        "y": 620,
+        "wires": []
+    },
+    {
+        "id": "60ccc05553e52d13",
+        "type": "link out",
+        "z": "2a81416e0ebc91b9",
+        "name": "link out 7",
+        "mode": "link",
+        "links": [
+            "d4d6d93bfaf6fde9"
+        ],
+        "x": 2135,
+        "y": 680,
+        "wires": []
+    },
+    {
+        "id": "29e3779e86de9c32",
         "type": "eth-ip in",
         "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
+        "g": "681514f16e6da48b",
         "endpoint": "203f07952504de9b",
         "mode": "single",
         "variable": "IQ_LogBuffer_HOA",
@@ -14345,122 +15284,19 @@
         "includeTimestamp": false,
         "addErrorOutput": false,
         "outputs": 1,
-        "x": 200,
-        "y": 320,
+        "x": 180,
+        "y": 240,
         "wires": [
             [
-                "step1_hoa_one_switch"
+                "db2ba734241f0b1a"
             ]
         ]
     },
     {
-        "id": "step1_hoa_one_switch",
-        "type": "switch",
-        "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
-        "name": "HOA = 1 (Manual)?",
-        "property": "payload",
-        "propertyType": "msg",
-        "rules": [
-            {
-                "t": "eq",
-                "v": "1",
-                "vt": "num"
-            }
-        ],
-        "checkall": "true",
-        "repair": false,
-        "outputs": 1,
-        "x": 430,
-        "y": 320,
-        "wires": [
-            [
-                "step1_build_sync"
-            ]
-        ]
-    },
-    {
-        "id": "step1_build_sync",
+        "id": "8e514499706171c9",
         "type": "function",
         "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
-        "name": "Build Tag Table Mapping Sync",
-        "func": "// const snapshot = flow.get('tagNameArraysSnapshot');\n// if (!snapshot) {\n//     node.error('Tag name arrays not cached yet. Wait at least 30s after deploy, then retry HOA=1.', msg);\n//     node.status({ fill: 'red', shape: 'ring', text: 'no snapshot yet' });\n//     return null;\n// }\n\nfunction deriveTableName(tagName) {\n    return tagName.replace(/\\./g, '_');\n}\n\nconst numericByIndex = flow.get('tagNameNumericSnapshot') || {};\nconst stringByIndex = flow.get('tagNameStringSnapshot') || {};\nconst rows = [];\n\nfor (const idx of Object.keys(numericByIndex)) {\n    const i = parseInt(idx, 10);\n    if (i === 0) continue;\n    const raw = numericByIndex[idx];\n    const tagName = (typeof raw === 'string' ? raw : '').trim();\n    if (!tagName) continue;\n    // Set the type flag to 1 for numbers and 2 for strings; avoid 0 since it's the default and hides errors.\n    rows.push([tagName, deriveTableName(tagName), i, 1]);\n}\n\nfor (const idx of Object.keys(stringByIndex)) {\n    const i = parseInt(idx, 10);\n    if (i === 0) continue;\n    const raw = stringByIndex[idx];\n    const tagName = (typeof raw === 'string' ? raw : '').trim();\n    if (!tagName) continue;\n    rows.push([tagName, deriveTableName(tagName), i, 2]);\n}\n\nif (rows.length === 0) {\n    node.warn('No valid tag names found in either array; nothing to sync.');\n    node.status({ fill: 'yellow', shape: 'ring', text: 'empty arrays' });\n    return null;\n}\n\nconst placeholders = rows.map(() => '(?,?,?,?)').join(',');\nmsg.topic = 'INSERT INTO tagtablemapping (TagName, TableName, tagID, tagDomain) VALUES ' + placeholders + ' ON DUPLICATE KEY UPDATE tagID = VALUES(tagID), tagDomain = VALUES(tagDomain), TableName = VALUES(TableName)';\nmsg.payload = rows.flat();\nmsg.syncRowCount = rows.length;\nnode.status({ fill: 'blue', shape: 'dot', text: 'Syncing ' + rows.length + ' rows' });\nreturn msg;",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 710,
-        "y": 320,
-        "wires": [
-            [
-                "step1_mysql_sync"
-            ]
-        ]
-    },
-    {
-        "id": "step1_mysql_sync",
-        "type": "mysql",
-        "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
-        "mydb": "3ad98402733282af",
-        "name": "MySQL - Sync Tag Table Mapping",
-        "x": 1030,
-        "y": 320,
-        "wires": [
-            [
-                "step1_set_zero"
-            ]
-        ]
-    },
-    {
-        "id": "step1_set_zero",
-        "type": "change",
-        "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
-        "name": "Set Payload 0",
-        "rules": [
-            {
-                "t": "set",
-                "p": "payload",
-                "pt": "msg",
-                "to": "0",
-                "tot": "num"
-            }
-        ],
-        "action": "",
-        "property": "",
-        "from": "",
-        "to": "",
-        "reg": false,
-        "x": 1300,
-        "y": 320,
-        "wires": [
-            [
-                "step1_write_hoa_zero"
-            ]
-        ]
-    },
-    {
-        "id": "step1_write_hoa_zero",
-        "type": "eth-ip out",
-        "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
-        "endpoint": "3354b11637a89f2c",
-        "variable": "IQ_LogBuffer_HOA",
-        "program": "",
-        "name": "Reset HOA to 0",
-        "x": 1520,
-        "y": 320,
-        "wires": []
-    },
-    {
-        "id": "032611c16dcb14d0",
-        "type": "function",
-        "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
+        "g": "681514f16e6da48b",
         "name": "Cache Tag Name Numeric Snapshot",
         "func": "const payload = msg.payload;\nconst numericByIndex = {};\n\nfor (const key of Object.keys(payload)) {\n    const m = key.match(/^NR_TagNameNumeric\\[(\\d+)\\]$/);\n    if (m) { numericByIndex[parseInt(m[1], 10)] = payload[key]; }\n}\n\nconst count = Object.values(numericByIndex).filter(v => typeof v === 'string' && v.trim() !== '').length;\nflow.set('tagNameNumericSnapshot', numericByIndex);\nnode.status({ fill: 'green', shape: 'dot', text: `Numeric: ${count}` });\nreturn null;",
         "outputs": 1,
@@ -14469,17 +15305,39 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 590,
-        "y": 180,
+        "x": 570,
+        "y": 100,
         "wires": [
             []
         ]
     },
     {
-        "id": "4f3a9a7aa7a07331",
+        "id": "7bb7a4ba9c3620a6",
         "type": "eth-ip in",
         "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
+        "g": "681514f16e6da48b",
+        "endpoint": "a959344900b4c2ae",
+        "mode": "all",
+        "variable": "",
+        "program": "",
+        "name": "Read Numeric Tag Name",
+        "gatherMetrics": false,
+        "includeTimestamp": true,
+        "addErrorOutput": false,
+        "outputs": 1,
+        "x": 210,
+        "y": 100,
+        "wires": [
+            [
+                "8e514499706171c9"
+            ]
+        ]
+    },
+    {
+        "id": "e3520118b160de2b",
+        "type": "eth-ip in",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
         "endpoint": "1cc1f9dfe8c4fbd5",
         "mode": "all",
         "variable": "",
@@ -14489,19 +15347,19 @@
         "includeTimestamp": true,
         "addErrorOutput": false,
         "outputs": 1,
-        "x": 220,
-        "y": 260,
+        "x": 200,
+        "y": 180,
         "wires": [
             [
-                "fa0248a02d6a0a59"
+                "c092e828fda6d42b"
             ]
         ]
     },
     {
-        "id": "fa0248a02d6a0a59",
+        "id": "c092e828fda6d42b",
         "type": "function",
         "z": "2a81416e0ebc91b9",
-        "g": "step1_group",
+        "g": "681514f16e6da48b",
         "name": "Cache Tag Name String Snapshot",
         "func": "const payload = msg.payload;\nconst stringByIndex = {};\n\nfor (const key of Object.keys(payload)) {\n    const m = key.match(/^NR_TagNameSTR\\[(\\d+)\\]$/);\n    if (m) { stringByIndex[parseInt(m[1], 10)] = payload[key]; }\n}\n\nconst count = Object.values(stringByIndex).filter(v => typeof v === 'string' && v.trim() !== '').length;\nflow.set('tagNameStringSnapshot', stringByIndex);\nnode.status({ fill: 'green', shape: 'dot', text: `String: ${count}` });\nreturn null;",
         "outputs": 1,
@@ -14510,16 +15368,224 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 580,
-        "y": 260,
+        "x": 560,
+        "y": 180,
         "wires": [
             []
         ]
     },
     {
-        "id": "e8da02346a58f8cf",
+        "id": "db2ba734241f0b1a",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "HOA States",
+        "func": "// HOA semantics:\n//   0 = OFF      (held level, no action)\n//   1 = MANUAL   (momentary command: full resync, NR resets HOA to 0)\n//   2 = AUTO     (held level: distribution is driven by data-arrival events,\n//                 not by this node; AUTO gate just reads hoa_current)\n\nconst current = Number(msg.payload);\nif (!Number.isFinite(current)) {\n    node.warn('HOA payload not numeric: ' + msg.payload);\n    return null;\n}\n\nconst prev = flow.get('hoa_prev');\nflow.set('hoa_prev', current);\nflow.set('hoa_current', current);\n\nconst labels = { 0: 'OFF', 1: 'MANUAL', 2: 'AUTO' };\nconst label = labels[current] ?? `?(${current})`;\nconst fill = current === 2 ? 'green' : current === 1 ? 'blue' : 'grey';\n\nif (current !== prev) {\n    const prevLabel = labels[prev] ?? (prev === undefined ? 'INIT' : `?(${prev})`);\n    node.status({ fill, shape: 'dot', text: `${prevLabel} \\u2192 ${label}` });\n} else {\n    node.status({ fill, shape: 'ring', text: label });\n}\n\n// manual stuck-busy auto-clear (defensive)\nconst mSince = flow.get('hoa_manual_busy_since') || 0;\nif (flow.get('hoa_manual_busy') && Date.now() - mSince > 120000) {\n    node.warn('Manual busy stuck >120s; auto-clearing');\n    flow.set('hoa_manual_busy', false);\n}\n\n// Only MANUAL (1) is a momentary command.\nif (current === 1 && prev !== 1) {\n    if (flow.get('hoa_manual_busy')) {\n        node.warn('Manual sync running; ignoring trigger but ack-ing HOA');\n        return [null, { payload: 0 }];\n    }\n    flow.set('hoa_manual_busy', true);\n    flow.set('hoa_manual_busy_since', Date.now());\n    return [{ payload: 'start' }, { payload: 0 }];\n}\n\nreturn null;",
+        "outputs": 2,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 490,
+        "y": 240,
+        "wires": [
+            [
+                "d18eb46d5d56d09c"
+            ],
+            [
+                "96f7d10bee1606b9"
+            ]
+        ]
+    },
+    {
+        "id": "d18eb46d5d56d09c",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "Build Tag Table Mapping Sync",
+        "func": "function deriveTableName(tagName) {\n    return tagName.replace(/\\./g, '__');\n}\n\nconst numericByIndex = flow.get('tagNameNumericSnapshot') || {};\nconst stringByIndex = flow.get('tagNameStringSnapshot') || {};\nconst rows = [];\n\n// tagDomain: 1 = INT (numeric), 3 = VARCHAR (string)\n// Matches CASE statements in CreateTagTables / DistributeTagRecords.\nfor (const idx of Object.keys(numericByIndex)) {\n    const i = parseInt(idx, 10);\n    if (i === 0) continue;\n    const raw = numericByIndex[idx];\n    const tagName = (typeof raw === 'string' ? raw : '').trim();\n    if (!tagName) continue;\n    rows.push([tagName, deriveTableName(tagName), i, 1]);\n}\n\nfor (const idx of Object.keys(stringByIndex)) {\n    const i = parseInt(idx, 10);\n    if (i === 0) continue;\n    const raw = stringByIndex[idx];\n    const tagName = (typeof raw === 'string' ? raw : '').trim();\n    if (!tagName) continue;\n    rows.push([tagName, deriveTableName(tagName), i, 3]);\n}\n\nif (rows.length === 0) {\n    node.warn('No valid tag names cached; nothing to sync. Clearing busy flag.');\n    flow.set('hoa_manual_busy', false);\n    node.status({ fill: 'yellow', shape: 'ring', text: 'empty arrays' });\n    return null;\n}\n\nconst placeholders = rows.map(() => '(?,?,?,?)').join(',');\nmsg.topic = 'INSERT INTO tagtablemapping (TagName, TableName, tagID, tagDomain) VALUES ' + placeholders + ' ON DUPLICATE KEY UPDATE tagID = VALUES(tagID), tagDomain = VALUES(tagDomain), TableName = VALUES(TableName)';\nmsg.payload = rows.flat();\nmsg.syncRowCount = rows.length;\nnode.status({ fill: 'blue', shape: 'dot', text: 'Syncing ' + rows.length + ' rows' });\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 790,
+        "y": 240,
+        "wires": [
+            [
+                "b9e71778de2fe6c7"
+            ]
+        ]
+    },
+    {
+        "id": "b9e71778de2fe6c7",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "mydb": "3ad98402733282af",
+        "name": "MySQL - Sync Tag Table Mapping",
+        "x": 1100,
+        "y": 240,
+        "wires": [
+            [
+                "4307a55f2503d0fe"
+            ]
+        ]
+    },
+    {
+        "id": "4307a55f2503d0fe",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "CALL CreateTagTables",
+        "func": "msg.topic = 'CALL siroflex.CreateTagTables()';\nmsg.payload = [];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1400,
+        "y": 240,
+        "wires": [
+            [
+                "389a3f9f0306acd0"
+            ]
+        ]
+    },
+    {
+        "id": "389a3f9f0306acd0",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "mydb": "3ad98402733282af",
+        "name": "MySQL – CreateTagTables",
+        "x": 1700,
+        "y": 240,
+        "wires": [
+            [
+                "55485485c219433f"
+            ]
+        ]
+    },
+    {
+        "id": "55485485c219433f",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "Call DistributeTagRecords",
+        "func": "msg.topic = 'CALL siroflex.DistributeTagRecords()';\nmsg.payload = [];\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1390,
+        "y": 320,
+        "wires": [
+            [
+                "52e2a2a4e8a117c3"
+            ]
+        ]
+    },
+    {
+        "id": "52e2a2a4e8a117c3",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "mydb": "3ad98402733282af",
+        "name": "MySQL: DistributeTagRecords",
+        "x": 1710,
+        "y": 320,
+        "wires": [
+            [
+                "9f093a48b2913493"
+            ]
+        ]
+    },
+    {
+        "id": "9f093a48b2913493",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "Clear Busy Flag",
+        "func": "flow.set('hoa_manual_busy', false);\nnode.status({ fill: 'green', shape: 'dot', text: 'MANUAL sync complete' });\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1980,
+        "y": 320,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "96f7d10bee1606b9",
+        "type": "change",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "Set Payload 0",
+        "rules": [
+            {
+                "t": "set",
+                "p": "payload",
+                "pt": "msg",
+                "to": "0",
+                "tot": "str"
+            }
+        ],
+        "action": "",
+        "property": "",
+        "from": "",
+        "to": "",
+        "reg": false,
+        "x": 740,
+        "y": 300,
+        "wires": [
+            [
+                "b3deac6136e1e374"
+            ]
+        ]
+    },
+    {
+        "id": "b3deac6136e1e374",
+        "type": "eth-ip out",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "endpoint": "3354b11637a89f2c",
+        "variable": "IQ_LogBuffer_HOA",
+        "program": "",
+        "name": "Reset HOA to 0",
+        "x": 1040,
+        "y": 300,
+        "wires": []
+    },
+    {
+        "id": "ec92897434f8aaa7",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "mydb": "3ad98402733282af",
+        "name": "MySQL: DistributeTagRecords (AUTO)",
+        "x": 970,
+        "y": 380,
+        "wires": [
+            [
+                "0b662debeb4d802e"
+            ]
+        ]
+    },
+    {
+        "id": "8bdf430c2d762421",
         "type": "inject",
         "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
         "name": "Three Second Processing Timer",
         "props": [
             {
@@ -14533,18 +15599,347 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 320,
-        "y": 800,
+        "x": 260,
+        "y": 1000,
         "wires": [
             [
-                "68883bcee91ec246"
+                "04548be1127c49b6"
             ]
         ]
     },
     {
-        "id": "49c5de0bd7ba9ab2",
+        "id": "04548be1127c49b6",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "Build Insert Data from Numeric Snapshot",
+        "func": "/*\n * Reads the latest PLC snapshot from flow context and produces MySQL INSERT\n * statements for any new records since the last committed seqId (RDindex).\n *\n * Design:\n *   - PLC writes records into a circular buffer of 300 slots. Slot index for\n *     a given SeqID is (SeqID - 1) % 300.\n *   - We process records in seqId order. Each cycle, we scan every slot,\n *     keep records with seqId > RDindex, sort them, take only the contiguous\n *     run starting at RDindex+1 (a gap means a record is still being written).\n *   - Records with unknown tag IDs go to the catchall table; known tag IDs\n *     go to log_records.\n *\n * Overrun handling:\n *   - If the slot that should hold RDindex+1 contains a different seqId,\n *     the PLC has wrapped past us. Resync RDindex forward to the smallest\n *     seqId in the buffer that's still in its expected slot. Records between\n *     old and new RDindex are permanently lost (logged as warning).\n *     INSERT IGNORE in the SQL handles duplicates at edge cases.\n *\n * Output: msg with .knownInsert and .catchallInsert, each {topic, payload}\n *         ready to feed into a MySQL node. Or null if nothing to commit.\n */\n\nconst BUFFER_SIZE = flow.get('BUFFER_SIZE') || 300;\nconst NUM_DOMAIN = 1;\n\nconst tStart = Date.now();\nflow.set('pipelineCycleStart', tStart);\n\ntry {\n\n  // =============================================================\n  // PHASE 1: Load snapshot and validate freshness\n  // =============================================================\n  const snapshot = flow.get('numericLogBufferSnapshot');\n  if (!snapshot || !Array.isArray(snapshot.buffer)) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'waiting for first read' });\n    return null;\n  }\n  if (Date.now() - snapshot.snapshotTime > 15000) {\n    node.status({ fill: 'red', shape: 'ring', text: 'snapshot is stale' });\n    return null;\n  }\n\n  const tagCache = flow.get('tagId') || [];\n  const validTagIds = new Set(\n    tagCache.filter(t => Number(t.tagDomain) === NUM_DOMAIN).map(t => t.tagID)\n  );\n\n  // Helper: converts PLC 64-bit microsecond timestamp to MySQL DATETIME string\n  function microsToDatetime(raw) {\n    if (raw === null || raw === undefined) return null;\n    try {\n      let ms;\n      if (typeof raw !== 'object') {\n        ms = Number(BigInt(raw) / 1000n);\n      } else {\n        const low = raw.low ?? raw[0];\n        const high = raw.high ?? raw[1];\n        if (low === undefined || high === undefined) return null;\n        const big = (BigInt(high >>> 0) << 32n) | BigInt(low >>> 0);\n        ms = Number(big / 1000n);\n      }\n      const d = new Date(ms);\n      const pad = n => String(n).padStart(2, '0');\n      const pad3 = n => String(n).padStart(3, '0');\n      return `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())} ` +\n        `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad3(d.getMilliseconds())}`;\n    } catch (e) {\n      return null;\n    }\n  }\n\n  // =============================================================\n  // PHASE 2: Buffer-wide stats — write position and seqId range\n  // =============================================================\n  let readIndexSeqId = Number(snapshot.readIndexSeqId);\n  const writeIndex = Number(snapshot.writeIndex);\n  const writeSlot = Number.isFinite(writeIndex)\n    ? ((writeIndex % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE\n    : -1;\n\n  let maxBufferSeqId = readIndexSeqId;\n  let minBufferSeqId = Infinity;\n  for (const r of snapshot.buffer) {\n    if (!r) continue;\n    const s = Number(r.SeqID);\n    if (Number.isFinite(s) && s > 0) {\n      if (s > maxBufferSeqId) maxBufferSeqId = s;\n      if (s < minBufferSeqId) minBufferSeqId = s;\n    }\n  }\n\n  // =============================================================\n  // PHASE 3: Overrun detection — has the PLC wrapped past us?\n  //   Check whether the slot that should hold RDindex+1 actually does.\n  //   If not, the record has been overwritten. Resync forward to the\n  //   smallest still-valid seqId in the buffer.\n  // =============================================================\n  const expectedSeqId = readIndexSeqId + 1;\n  const expectedSlot = (((expectedSeqId - 1) % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE;\n  const slotOccupant = snapshot.buffer[expectedSlot];\n  const slotSeqId = slotOccupant ? Number(slotOccupant.SeqID) : null;\n\n  const slotMismatch = slotSeqId !== null\n    && Number.isFinite(slotSeqId)\n    && slotSeqId !== expectedSeqId\n    && expectedSlot !== writeSlot;\n\n  if (slotMismatch) {\n    // Find smallest seqId that is (a) > RDindex, (b) in its expected slot\n    // (so it's from the current wrap, not stale data), and (c) not in\n    // writeSlot (which may be mid-write / torn).\n    let resyncTarget = null;\n    for (let i = 0; i < BUFFER_SIZE; i++) {\n      const occ = snapshot.buffer[i];\n      if (!occ) continue;\n      const s = Number(occ.SeqID);\n      if (!Number.isFinite(s) || s <= readIndexSeqId) continue;\n      const expectedSlotForS = (((s - 1) % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE;\n      if (expectedSlotForS !== i) continue;\n      if (i === writeSlot) continue;\n      if (resyncTarget === null || s < resyncTarget) resyncTarget = s;\n    }\n\n    if (resyncTarget !== null) {\n      const newRDindex = resyncTarget - 1;\n      // if (newRDindex > readIndexSeqId) {\n      //   const lost = newRDindex - readIndexSeqId;\n      //   node.warn(`BUFFER OVERRUN (slot check): ${lost} record(s) lost (seqIds ${readIndexSeqId + 1}–${newRDindex}). Slot ${expectedSlot} holds seqId ${slotSeqId}, expected ${expectedSeqId}. Resyncing RDindex forward to ${newRDindex}.`);\n      //   readIndexSeqId = newRDindex;\n      // }\n      if (newRDindex > readIndexSeqId) {\n        const lost = newRDindex - readIndexSeqId;\n        node.warn(`BUFFER OVERRUN (slot check): ${lost} record(s) lost (seqIds ${readIndexSeqId + 1}–${newRDindex}). Slot ${expectedSlot} holds seqId ${slotSeqId}, expected ${expectedSeqId}. Resyncing RDindex forward to ${newRDindex}.`);\n        \n        // Record the loss event for audit\n        msg._overrunEvent = {\n            eventTime: new Date(),\n            pipeline: 'numeric',  // use 'string' in the string version\n            seqIdFirstLost: readIndexSeqId + 1,\n            seqIdLastLost: newRDindex,\n            recordsLost: lost,\n            rdindexBefore: readIndexSeqId,\n            rdindexAfter: newRDindex,\n            plcWriteIndex: writeIndex,\n            bufferMinSeq: Number.isFinite(minBufferSeqId) ? minBufferSeqId : null,\n            bufferMaxSeq: maxBufferSeqId\n        };\n        \n        readIndexSeqId = newRDindex;\n    }\n    } else {\n      node.warn(`BUFFER OVERRUN (slot check): slot ${expectedSlot} holds seqId ${slotSeqId}, expected ${expectedSeqId}, but no valid forward resync target found. Will retry next cycle.`);\n    }\n  }\n\n  // =============================================================\n  // PHASE 4: Collect candidate records from the buffer\n  //   Skip writeSlot (PLC may be writing it right now).\n  //   Records that fail to parse are flagged as \"torn reads\" — we'll\n  //   stop committing at the earliest torn seqId so we don't skip past it.\n  // =============================================================\n  const records = [];\n  const tornSeqIds = [];\n\n  for (let slot = 0; slot < BUFFER_SIZE; slot++) {\n    if (slot === writeSlot) continue;\n    const r = snapshot.buffer[slot];\n    if (!r) continue;\n\n    const seqId = Number(r.SeqID);\n    if (!(seqId > readIndexSeqId)) continue;\n\n    const tagId = Number(r.TagID);\n    const valueInt = Number(r.Value);\n    const valueReal = Number(r.Value_REAL);\n    const dataType = Number(r.DType);\n    const quality = Number(r.Quality);\n    const dateTimeStr = microsToDatetime(r.Time);\n\n    if (![tagId, valueInt, valueReal, dataType, quality].every(Number.isFinite) || dateTimeStr === null) {\n      tornSeqIds.push(seqId);\n      continue;\n    }\n\n    const knownTag = validTagIds.has(tagId);\n    records.push({ seqId, tagId, valueInt, valueReal, dataType, dateTimeStr, quality, knownTag });\n  }\n\n  const tAfterLoop = Date.now();\n\n  if (records.length === 0) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'no new records' });\n    return null;\n  }\n\n  // =============================================================\n  // PHASE 5: Sort, find contiguous run from RDindex+1, stop at torn reads\n  // =============================================================\n  records.sort((a, b) => a.seqId - b.seqId);\n\n  const contiguous = [];\n  let expected = readIndexSeqId + 1;\n  for (const r of records) {\n    if (r.seqId !== expected) break;\n    contiguous.push(r);\n    expected = r.seqId + 1;\n  }\n\n  const minTornSeqId = tornSeqIds.length > 0 ? Math.min(...tornSeqIds) : Infinity;\n  const commitBatch = contiguous.filter(r => r.seqId < minTornSeqId);\n\n  if (commitBatch.length === 0) {\n    const status = contiguous.length === 0\n      ? `waiting for seqId ${readIndexSeqId + 1}`\n      : 'all blocked by torn read';\n    node.status({ fill: 'yellow', shape: 'ring', text: status });\n    return null;\n  }\n\n  // =============================================================\n  // PHASE 6: Split known vs catchall, build INSERT statements\n  // =============================================================\n  const maxCommittedSeqId = commitBatch[commitBatch.length - 1].seqId;\n  const knownRows = commitBatch.filter(r => r.knownTag);\n  const catchallRows = commitBatch.filter(r => !r.knownTag);\n\n  const buildInsert = (rows, table) => ({\n    topic: `INSERT IGNORE INTO ${table} (seq_id, tag_id, tag_datatype, tag_domain, value_int, value_real, value_string, date_time, quality) VALUES ${rows.map(() => '(?,?,?,?,?,?,?,?,?)').join(',')}`,\n    payload: rows.flatMap(r => [r.seqId, r.tagId, r.dataType, NUM_DOMAIN, r.valueInt, r.valueReal, null, r.dateTimeStr, r.quality])\n  });\n\n  msg.maxCommittedSeqId = maxCommittedSeqId;\n  msg.recordCount = commitBatch.length;\n  msg.bufferType = 'numeric';\n  msg.knownInsert = knownRows.length > 0 ? buildInsert(knownRows, 'siroflex.log_records') : null;\n  msg.catchallInsert = catchallRows.length > 0 ? buildInsert(catchallRows, 'siroflex.tag_history_catchall') : null;\n  msg.timing = { tStart, tAfterSQL: Date.now(), pipeline: 'numeric' };\n\n  node.status({ fill: 'blue', shape: 'dot', text: `${knownRows.length} log / ${catchallRows.length} catchall, RD -> ${maxCommittedSeqId}` });\n  return msg;\n\n} catch (err) {\n  node.error('Numeric processing failed: ' + (err.message || err));\n  return null;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 660,
+        "y": 1000,
+        "wires": [
+            [
+                "8909f4585187230d"
+            ]
+        ]
+    },
+    {
+        "id": "8909f4585187230d",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "Route Numeric - Insert Query",
+        "func": "// Outputs: [0] = known-tag insert, [1] = catchall insert, [2] = overrun log insert\n\nlet overrunMsg = null;\nif (msg._overrunEvent) {\n    overrunMsg = {\n        topic: `INSERT INTO siroflex.buffer_overrun_log \n                (event_time, pipeline, seqid_first_lost, seqid_last_lost, records_lost, \n                 rdindex_before, rdindex_after, plc_wrindex, buffer_min_seq, buffer_max_seq)\n                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,\n        payload: [\n            msg._overrunEvent.eventTime,\n            msg._overrunEvent.pipeline,\n            msg._overrunEvent.seqIdFirstLost,\n            msg._overrunEvent.seqIdLastLost,\n            msg._overrunEvent.recordsLost,\n            msg._overrunEvent.rdindexBefore,\n            msg._overrunEvent.rdindexAfter,\n            msg._overrunEvent.plcWriteIndex,\n            msg._overrunEvent.bufferMinSeq,\n            msg._overrunEvent.bufferMaxSeq\n        ]\n    };\n}\n\nconst baseFields = {\n    maxCommittedSeqId: msg.maxCommittedSeqId,\n    recordCount: msg.recordCount,\n    bufferType: msg.bufferType,\n    timing: msg.timing\n};\n\nconst knownMsg = msg.knownInsert ? {\n    topic: msg.knownInsert.topic,\n    payload: msg.knownInsert.payload,\n    _targetTable: 'log_records',\n    ...baseFields\n} : null;\n\nconst catchallMsg = msg.catchallInsert ? {\n    topic: msg.catchallInsert.topic,\n    payload: msg.catchallInsert.payload,\n    _targetTable: 'catchall',\n    ...baseFields\n} : null;\n\nif (!knownMsg && !catchallMsg && !overrunMsg) return null;\n\nreturn [knownMsg, catchallMsg, overrunMsg];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1060,
+        "y": 1000,
+        "wires": [
+            [
+                "9277197bc36a6c8e"
+            ],
+            [
+                "1f1e76a6c1fd2325"
+            ],
+            [
+                "cdfcacb0065c2894"
+            ]
+        ]
+    },
+    {
+        "id": "9277197bc36a6c8e",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "mydb": "3ad98402733282af",
+        "name": "INSERT log_records (Numeric)",
+        "x": 1470,
+        "y": 860,
+        "wires": [
+            [
+                "6638fbd74f6933e3"
+            ]
+        ]
+    },
+    {
+        "id": "1f1e76a6c1fd2325",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "mydb": "3ad98402733282af",
+        "name": "INSERT tag_history_catchall (Numeric)",
+        "x": 1440,
+        "y": 940,
+        "wires": [
+            [
+                "6638fbd74f6933e3"
+            ]
+        ]
+    },
+    {
+        "id": "6638fbd74f6933e3",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "Commit And Write Back Indices (Numeric)",
+        "func": "if (msg.error) {\n    node.warn('MySQL insert failed, numeric indices NOT advanced: ' + (msg.error.message || msg.error));\n    node.status({ fill: 'red', shape: 'ring', text: 'database error' });\n    return [null, { payload: 'trigger' }];\n}\n\n// print timing\nif (msg.timing) {\n    const tDone = Date.now();\n    const { tStart, tAfterLoop, tAfterSQL } = msg.timing;\n\n    node.log(\n        `[NUMERIC] records=${msg.recordCount} table=${msg._targetTable} | ` +\n       // `slot loop=${tAfterLoop - tStart}ms | ` +\n       // `sort+sql=${tAfterSQL - tAfterLoop}ms | ` +\n        `db insert=${tDone - tAfterSQL}ms | ` +\n        `TOTAL=${tDone - tStart}ms`\n    );\n\n}\n\nnode.status({ fill: 'green', shape: 'dot', text: `committed ${msg.recordCount} (${msg._targetTable}), RDindex -> ${msg.maxCommittedSeqId}` });\nreturn [\n    { payload: msg.maxCommittedSeqId },\n    { payload: 'trigger' }\n];",
+        "outputs": 2,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1820,
+        "y": 900,
+        "wires": [
+            [
+                "e5fe74eb6cd1ab93",
+                "2ce5997e7010829e"
+            ],
+            [
+                "2ae31aebfd578c09"
+            ]
+        ]
+    },
+    {
+        "id": "e5fe74eb6cd1ab93",
+        "type": "eth-ip out",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "endpoint": "1b55b1afbce46b8d",
+        "variable": "MB_LogNUM_Buffer_TX.RDindex",
+        "program": "",
+        "name": "Write Num Read Index To PLC",
+        "x": 2210,
+        "y": 860,
+        "wires": []
+    },
+    {
+        "id": "ba51f46ea5435f91",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "Build Insert Data from String Snapshot",
+        "func": "/*\n * String-buffer counterpart of the Numeric Build function. Same design,\n * same overrun handling, same output shape — see the numeric version\n * for full design notes.\n *\n * Differences from numeric pipeline:\n *   - Reads from stringLogBufferSnapshot (not numericLogBufferSnapshot)\n *   - Tag domain is 3 (STR_DOMAIN), data type is 5\n *   - Records have Value_STR instead of Value/Value_REAL\n *   - Timestamp field is DateTime, not Time\n *   - SQL payload columns shift: value_string is set, value_int/real are null\n */\n\nconst BUFFER_SIZE = flow.get('BUFFER_SIZE') || 300;\nconst STR_DOMAIN = 3;\n\nconst tStart = Date.now();\n\ntry {\n\n  // =============================================================\n  // PHASE 1: Load snapshot and validate freshness\n  // =============================================================\n  const snapshot = flow.get('stringLogBufferSnapshot');\n  if (!snapshot || !Array.isArray(snapshot.buffer)) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'waiting for first read' });\n    return null;\n  }\n  if (Date.now() - snapshot.snapshotTime > 15000) {\n    node.status({ fill: 'red', shape: 'ring', text: 'snapshot is stale' });\n    return null;\n  }\n\n  const tagCache = flow.get('tagId') || [];\n  const validTagIds = new Set(\n    tagCache.filter(t => Number(t.tagDomain) === STR_DOMAIN).map(t => t.tagID)\n  );\n\n  function microsToDatetime(raw) {\n    if (raw === null || raw === undefined) return null;\n    try {\n      let ms;\n      if (typeof raw !== 'object') {\n        ms = Number(BigInt(raw) / 1000n);\n      } else {\n        const low = raw.low ?? raw[0];\n        const high = raw.high ?? raw[1];\n        if (low === undefined || high === undefined) return null;\n        const big = (BigInt(high >>> 0) << 32n) | BigInt(low >>> 0);\n        ms = Number(big / 1000n);\n      }\n      const d = new Date(ms);\n      const pad  = n => String(n).padStart(2, '0');\n      const pad3 = n => String(n).padStart(3, '0');\n      return `${d.getFullYear()}-${pad(d.getMonth()+1)}-${pad(d.getDate())} ` +\n             `${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}.${pad3(d.getMilliseconds())}`;\n    } catch (e) {\n      return null;\n    }\n  }\n\n  // =============================================================\n  // PHASE 2: Buffer-wide stats — write position and seqId range\n  // =============================================================\n  let readIndexSeqId = Number(snapshot.readIndexSeqId);\n  const writeIndex = Number(snapshot.writeIndex);\n  const writeSlot = Number.isFinite(writeIndex)\n    ? ((writeIndex % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE\n    : -1;\n\n  let maxBufferSeqId = readIndexSeqId;\n  let minBufferSeqId = Infinity;\n  for (const r of snapshot.buffer) {\n    if (!r) continue;\n    const s = Number(r.SeqID);\n    if (Number.isFinite(s) && s > 0) {\n      if (s > maxBufferSeqId) maxBufferSeqId = s;\n      if (s < minBufferSeqId) minBufferSeqId = s;\n    }\n  }\n\n  // =============================================================\n  // PHASE 3: Overrun detection — see Numeric version for design notes\n  // =============================================================\n  const expectedSeqId = readIndexSeqId + 1;\n  const expectedSlot = (((expectedSeqId - 1) % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE;\n  const slotOccupant = snapshot.buffer[expectedSlot];\n  const slotSeqId = slotOccupant ? Number(slotOccupant.SeqID) : null;\n\n  const slotMismatch = slotSeqId !== null\n    && Number.isFinite(slotSeqId)\n    && slotSeqId !== expectedSeqId\n    && expectedSlot !== writeSlot;\n\n  if (slotMismatch) {\n    let resyncTarget = null;\n    for (let i = 0; i < BUFFER_SIZE; i++) {\n      const occ = snapshot.buffer[i];\n      if (!occ) continue;\n      const s = Number(occ.SeqID);\n      if (!Number.isFinite(s) || s <= readIndexSeqId) continue;\n      const expectedSlotForS = (((s - 1) % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE;\n      if (expectedSlotForS !== i) continue;\n      if (i === writeSlot) continue;\n      if (resyncTarget === null || s < resyncTarget) resyncTarget = s;\n    }\n\n    if (resyncTarget !== null) {\n      const newRDindex = resyncTarget - 1;\n      // if (newRDindex > readIndexSeqId) {\n      //   const lost = newRDindex - readIndexSeqId;\n      //   node.warn(`BUFFER OVERRUN (slot check): ${lost} record(s) lost (seqIds ${readIndexSeqId + 1}–${newRDindex}). Slot ${expectedSlot} holds seqId ${slotSeqId}, expected ${expectedSeqId}. Resyncing RDindex forward to ${newRDindex}.`);\n      //   readIndexSeqId = newRDindex;\n      // }\n      if (newRDindex > readIndexSeqId) {\n        const lost = newRDindex - readIndexSeqId;\n        node.warn(`BUFFER OVERRUN (slot check): ${lost} record(s) lost (seqIds ${readIndexSeqId + 1}–${newRDindex}). Slot ${expectedSlot} holds seqId ${slotSeqId}, expected ${expectedSeqId}. Resyncing RDindex forward to ${newRDindex}.`);\n\n        // Record the loss event for audit\n        msg._overrunEvent = {\n          eventTime: new Date(),\n          pipeline: 'numeric',  // use 'string' in the string version\n          seqIdFirstLost: readIndexSeqId + 1,\n          seqIdLastLost: newRDindex,\n          recordsLost: lost,\n          rdindexBefore: readIndexSeqId,\n          rdindexAfter: newRDindex,\n          plcWriteIndex: writeIndex,\n          bufferMinSeq: Number.isFinite(minBufferSeqId) ? minBufferSeqId : null,\n          bufferMaxSeq: maxBufferSeqId\n        };\n\n        readIndexSeqId = newRDindex;\n      }\n    } else {\n      node.warn(`BUFFER OVERRUN (slot check): slot ${expectedSlot} holds seqId ${slotSeqId}, expected ${expectedSeqId}, but no valid forward resync target found. Will retry next cycle.`);\n    }\n  }\n\n  // =============================================================\n  // PHASE 4: Collect candidate records from the buffer\n  // =============================================================\n  const records = [];\n  const tornSeqIds = [];\n\n  for (let slot = 0; slot < BUFFER_SIZE; slot++) {\n    if (slot === writeSlot) continue;\n    const r = snapshot.buffer[slot];\n    if (!r) continue;\n\n    const seqId = Number(r.SeqID);\n    if (!(seqId > readIndexSeqId)) continue;\n\n    const tagId = Number(r.TagID);\n    const valueString = r.Value_STR ?? null;\n    const dataType = 5;\n    const quality = Number(r.Quality);\n    const dateTimeStr = microsToDatetime(r.DateTime);\n\n    if (![tagId, quality].every(Number.isFinite) || dateTimeStr === null) {\n      tornSeqIds.push(seqId);\n      continue;\n    }\n\n    const knownTag = validTagIds.has(tagId);\n    records.push({ seqId, tagId, valueString, dataType, dateTimeStr, quality, knownTag });\n  }\n\n  if (records.length === 0) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'no new records' });\n    return null;\n  }\n\n  // =============================================================\n  // PHASE 5: Sort, find contiguous run, stop at torn reads\n  // =============================================================\n  records.sort((a, b) => a.seqId - b.seqId);\n\n  const contiguous = [];\n  let expected = readIndexSeqId + 1;\n  for (const r of records) {\n    if (r.seqId !== expected) break;\n    contiguous.push(r);\n    expected = r.seqId + 1;\n  }\n\n  const minTornSeqId = tornSeqIds.length > 0 ? Math.min(...tornSeqIds) : Infinity;\n  const commitBatch = contiguous.filter(r => r.seqId < minTornSeqId);\n\n  if (commitBatch.length === 0) {\n    const status = contiguous.length === 0\n      ? `waiting for seqId ${readIndexSeqId + 1}`\n      : 'all blocked by torn read';\n    node.status({ fill: 'yellow', shape: 'ring', text: status });\n    return null;\n  }\n\n  // =============================================================\n  // PHASE 6: Split known vs catchall, build INSERT statements\n  // =============================================================\n  const maxCommittedSeqId = commitBatch[commitBatch.length - 1].seqId;\n  const knownRows = commitBatch.filter(r => r.knownTag);\n  const catchallRows = commitBatch.filter(r => !r.knownTag);\n\n  const buildInsert = (rows, table) => ({\n    topic: `INSERT IGNORE INTO ${table} (seq_id, tag_id, tag_datatype, tag_domain, value_int, value_real, value_string, date_time, quality) VALUES ${rows.map(() => '(?,?,?,?,?,?,?,?,?)').join(',')}`,\n    payload: rows.flatMap(r => [r.seqId, r.tagId, r.dataType, STR_DOMAIN, null, null, r.valueString, r.dateTimeStr, r.quality])\n  });\n\n  msg.maxCommittedSeqId = maxCommittedSeqId;\n  msg.recordCount = commitBatch.length;\n  msg.bufferType = 'string';\n  msg.knownInsert = knownRows.length > 0 ? buildInsert(knownRows, 'siroflex.log_records') : null;\n  msg.catchallInsert = catchallRows.length > 0 ? buildInsert(catchallRows, 'siroflex.tag_history_catchall') : null;\n  msg.timing = { tStart, tAfterSQL: Date.now(), pipeline: 'string' };\n\n  node.status({ fill: 'blue', shape: 'dot', text: `${knownRows.length} log / ${catchallRows.length} catchall, RD -> ${maxCommittedSeqId}` });\n  return msg;\n\n} catch (err) {\n  node.error('String processing failed: ' + (err.message || err));\n  return null;\n}",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 650,
+        "y": 1280,
+        "wires": [
+            [
+                "b3b93eb72a0245f3"
+            ]
+        ]
+    },
+    {
+        "id": "b3b93eb72a0245f3",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "Route String - Insert Query",
+        "func": "// Outputs: [0] = known-tag insert, [1] = catchall insert, [2] = overrun log insert\n\nlet overrunMsg = null;\nif (msg._overrunEvent) {\n    overrunMsg = {\n        topic: `INSERT INTO siroflex.buffer_overrun_log \n                (event_time, pipeline, seqid_first_lost, seqid_last_lost, records_lost, \n                 rdindex_before, rdindex_after, plc_wrindex, buffer_min_seq, buffer_max_seq)\n                VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,\n        payload: [\n            msg._overrunEvent.eventTime,\n            msg._overrunEvent.pipeline,\n            msg._overrunEvent.seqIdFirstLost,\n            msg._overrunEvent.seqIdLastLost,\n            msg._overrunEvent.recordsLost,\n            msg._overrunEvent.rdindexBefore,\n            msg._overrunEvent.rdindexAfter,\n            msg._overrunEvent.plcWriteIndex,\n            msg._overrunEvent.bufferMinSeq,\n            msg._overrunEvent.bufferMaxSeq\n        ]\n    };\n}\n\nconst baseFields = {\n    maxCommittedSeqId: msg.maxCommittedSeqId,\n    recordCount: msg.recordCount,\n    bufferType: msg.bufferType,\n    timing: msg.timing\n};\n\nconst knownMsg = msg.knownInsert ? {\n    topic: msg.knownInsert.topic,\n    payload: msg.knownInsert.payload,\n    _targetTable: 'log_records',\n    ...baseFields\n} : null;\n\nconst catchallMsg = msg.catchallInsert ? {\n    topic: msg.catchallInsert.topic,\n    payload: msg.catchallInsert.payload,\n    _targetTable: 'catchall',\n    ...baseFields\n} : null;\n\nif (!knownMsg && !catchallMsg && !overrunMsg) return null;\n\nreturn [knownMsg, catchallMsg, overrunMsg];",
+        "outputs": 3,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1040,
+        "y": 1280,
+        "wires": [
+            [
+                "12d712874e140530"
+            ],
+            [
+                "524fefa805087378"
+            ],
+            [
+                "dc14af6ffe5bf1dc"
+            ]
+        ]
+    },
+    {
+        "id": "12d712874e140530",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "mydb": "3ad98402733282af",
+        "name": "INSERT log_records (String)",
+        "x": 1460,
+        "y": 1160,
+        "wires": [
+            [
+                "7eeca96461dfb2b2"
+            ]
+        ]
+    },
+    {
+        "id": "524fefa805087378",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "mydb": "3ad98402733282af",
+        "name": "INSERT tag_history_catchall (String)",
+        "x": 1430,
+        "y": 1240,
+        "wires": [
+            [
+                "7eeca96461dfb2b2"
+            ]
+        ]
+    },
+    {
+        "id": "7eeca96461dfb2b2",
+        "type": "function",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "Commit And Write Back Indices (String)",
+        "func": "if (msg.error) {\n    node.warn('MySQL insert failed, string indices NOT advanced: ' + (msg.error.message || msg.error));\n    node.status({ fill: 'red', shape: 'ring', text: 'database error' });\n    return null;\n}\n\n// print timing report\nif (msg.timing) {\n    const tDone = Date.now();\n    const { tStart, tAfterLoop, tAfterSQL } = msg.timing;\n\n    const cycleStart = flow.get('pipelineCycleStart');  // ← numeric start time\n    const cycleTotal = cycleStart ? tDone - cycleStart : null;\n\n    node.log(\n        `[STRING] records=${msg.recordCount} table=${msg._targetTable} | ` +\n       // `slot loop=${tAfterLoop - tStart}ms | ` +\n       // `sort+sql=${tAfterSQL - tAfterLoop}ms | ` +\n        `db insert=${tDone - tAfterSQL}ms | ` +\n        `TOTAL=${tDone - tStart}ms` +\n        (cycleTotal !== null ? ` | CYCLE=${cycleTotal}ms` : '')\n    );\n}\nnode.status({ fill: 'green', shape: 'dot', text: `committed ${msg.recordCount} (${msg._targetTable}), RDindex -> ${msg.maxCommittedSeqId}` });\nreturn [{ payload: msg.maxCommittedSeqId }];",
+        "outputs": 1,
+        "timeout": "",
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1840,
+        "y": 1200,
+        "wires": [
+            [
+                "b0ad1a6b8e0b4bae",
+                "85b99fda36f08353"
+            ]
+        ]
+    },
+    {
+        "id": "b0ad1a6b8e0b4bae",
+        "type": "eth-ip out",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "endpoint": "fa3e471856ceea92",
+        "variable": "MB_LogSTR_Buffer_TX.RDindex",
+        "program": "",
+        "name": "Write String Read Index To PLC",
+        "x": 2210,
+        "y": 1200,
+        "wires": []
+    },
+    {
+        "id": "2ae31aebfd578c09",
+        "type": "link out",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "link out 2",
+        "mode": "link",
+        "links": [
+            "6ea8d3a49890dad9"
+        ],
+        "x": 2085,
+        "y": 1000,
+        "wires": []
+    },
+    {
+        "id": "6ea8d3a49890dad9",
+        "type": "link in",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "link in 9",
+        "links": [
+            "2ae31aebfd578c09"
+        ],
+        "x": 375,
+        "y": 1280,
+        "wires": [
+            [
+                "ba51f46ea5435f91"
+            ]
+        ]
+    },
+    {
+        "id": "49f8a3220dda7139",
+        "type": "link in",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "link in 10",
+        "links": [
+            "755ec6a561c6446d"
+        ],
+        "x": 1135,
+        "y": 860,
+        "wires": [
+            [
+                "9277197bc36a6c8e"
+            ]
+        ]
+    },
+    {
+        "id": "943752fd54d99017",
+        "type": "link in",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "link in 11",
+        "links": [
+            "8e1db23eb1f2e024"
+        ],
+        "x": 1135,
+        "y": 920,
+        "wires": [
+            [
+                "1f1e76a6c1fd2325"
+            ]
+        ]
+    },
+    {
+        "id": "aec258bce3b1d3ca",
+        "type": "link in",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "link in 12",
+        "links": [
+            "0f0c2d7ac8997ff8"
+        ],
+        "x": 1095,
+        "y": 1160,
+        "wires": [
+            [
+                "12d712874e140530"
+            ]
+        ]
+    },
+    {
+        "id": "d4d6d93bfaf6fde9",
+        "type": "link in",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "name": "link in 13",
+        "links": [
+            "60ccc05553e52d13"
+        ],
+        "x": 1095,
+        "y": 1220,
+        "wires": [
+            [
+                "524fefa805087378"
+            ]
+        ]
+    },
+    {
+        "id": "f0f7923f65687ed0",
         "type": "eth-ip in",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "endpoint": "1b55b1afbce46b8d",
         "mode": "all",
         "variable": "",
@@ -14554,36 +15949,38 @@
         "includeTimestamp": true,
         "addErrorOutput": false,
         "outputs": 1,
-        "x": 310,
-        "y": 560,
+        "x": 270,
+        "y": 600,
         "wires": [
             [
-                "a5648a71d18d299d"
+                "8e2735785bb1a582"
             ]
         ]
     },
     {
-        "id": "a5648a71d18d299d",
+        "id": "8e2735785bb1a582",
         "type": "function",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "name": "Cache Numeric Log Buffer Snapshot",
-        "func": "const BUFFER_SIZE = 200;\nconst payload = msg.payload;\nconst buffer = new Array(BUFFER_SIZE);\n\nfor (const key of Object.keys(payload)) {\n  const match = key.match(/^MB_LogNUM_Buffer\\[(\\d+)\\]$/);\n  if (match) {\n    buffer[parseInt(match[1], 10)] = RED.util.cloneMessage(payload[key]);\n  }\n}\n\nlet writeIndex, readIndexSeqId;\nif (payload['MB_LogNUM_Buffer_TX.WRindex'] !== undefined) {\n  writeIndex = payload['MB_LogNUM_Buffer_TX.WRindex'];\n  readIndexSeqId = payload['MB_LogNUM_Buffer_TX.RDindex'];\n} else if (payload['MB_LogNUM_Buffer_TX'] && typeof payload['MB_LogNUM_Buffer_TX'] === 'object') {\n  writeIndex = payload['MB_LogNUM_Buffer_TX'].WRindex;\n  readIndexSeqId = payload['MB_LogNUM_Buffer_TX'].RDindex;\n}\n\nflow.set('numericLogBufferSnapshot', {\n  buffer, writeIndex, readIndexSeqId, snapshotTime: Date.now()\n});\nnode.status({ fill: 'green', shape: 'dot', text: `WRindex=${writeIndex} RDindex(SeqID)=${readIndexSeqId}` });\nreturn null;",
+        "func": "const BUFFER_SIZE = flow.get('BUFFER_SIZE') || 300;\nconst payload = msg.payload;\nconst buffer = new Array(BUFFER_SIZE);\n\nfor (const key of Object.keys(payload)) {\n  const match = key.match(/^MB_LogNUM_Buffer\\[(\\d+)\\]$/);\n  if (match) {\n    buffer[parseInt(match[1], 10)] = RED.util.cloneMessage(payload[key]);\n  }\n}\n\nlet writeIndex, readIndexSeqId;\nif (payload['MB_LogNUM_Buffer_TX.WRindex'] !== undefined) {\n  writeIndex = payload['MB_LogNUM_Buffer_TX.WRindex'];\n  readIndexSeqId = payload['MB_LogNUM_Buffer_TX.RDindex'];\n} else if (payload['MB_LogNUM_Buffer_TX'] && typeof payload['MB_LogNUM_Buffer_TX'] === 'object') {\n  writeIndex = payload['MB_LogNUM_Buffer_TX'].WRindex;\n  readIndexSeqId = payload['MB_LogNUM_Buffer_TX'].RDindex;\n}\n\nflow.set('numericLogBufferSnapshot', {\n  buffer, writeIndex, readIndexSeqId, snapshotTime: Date.now()\n});\nnode.status({ fill: 'green', shape: 'dot', text: `WRindex=${writeIndex} RDindex(SeqID)=${readIndexSeqId}` });\nreturn null;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 690,
-        "y": 560,
+        "x": 650,
+        "y": 600,
         "wires": [
             []
         ]
     },
     {
-        "id": "c497814c920bd90f",
+        "id": "a1a8c07e75ad029c",
         "type": "eth-ip in",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "endpoint": "fa3e471856ceea92",
         "mode": "all",
         "variable": "",
@@ -14593,36 +15990,38 @@
         "includeTimestamp": true,
         "addErrorOutput": false,
         "outputs": 1,
-        "x": 320,
-        "y": 620,
+        "x": 280,
+        "y": 680,
         "wires": [
             [
-                "80aaf063546fa4b8"
+                "6efc9ffe337aade9"
             ]
         ]
     },
     {
-        "id": "80aaf063546fa4b8",
+        "id": "6efc9ffe337aade9",
         "type": "function",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "name": "Cache String Log Buffer Snapshot",
-        "func": "const BUFFER_SIZE = 200;\nconst payload = msg.payload;\nconst buffer = new Array(BUFFER_SIZE);\n\nfor (const key of Object.keys(payload)) {\n    const match = key.match(/^MB_LogSTR_Buffer\\[(\\d+)\\]$/);\n    if (match) {\n        buffer[parseInt(match[1], 10)] = RED.util.cloneMessage(payload[key]);\n    }\n}\n\nlet writeIndex, readIndexSeqId;\nif (payload['MB_LogSTR_Buffer_TX.WRindex'] !== undefined) {\n    writeIndex = payload['MB_LogSTR_Buffer_TX.WRindex'];\n    readIndexSeqId = payload['MB_LogSTR_Buffer_TX.RDindex'];\n} else if (payload['MB_LogSTR_Buffer_TX'] && typeof payload['MB_LogSTR_Buffer_TX'] === 'object') {\n    writeIndex = payload['MB_LogSTR_Buffer_TX'].WRindex;\n    readIndexSeqId = payload['MB_LogSTR_Buffer_TX'].RDindex;\n}\n\nflow.set('stringLogBufferSnapshot', {\n    buffer, writeIndex, readIndexSeqId, snapshotTime: Date.now()\n});\nnode.status({ fill: 'green', shape: 'dot', text: `WRindex=${writeIndex} RDindex(SeqID)=${readIndexSeqId}` });\nreturn null;",
+        "func": "const BUFFER_SIZE = flow.get('BUFFER_SIZE') || 300;\nconst payload = msg.payload;\nconst buffer = new Array(BUFFER_SIZE);\n\nfor (const key of Object.keys(payload)) {\n    const match = key.match(/^MB_LogSTR_Buffer\\[(\\d+)\\]$/);\n    if (match) {\n        buffer[parseInt(match[1], 10)] = RED.util.cloneMessage(payload[key]);\n    }\n}\n\nlet writeIndex, readIndexSeqId;\nif (payload['MB_LogSTR_Buffer_TX.WRindex'] !== undefined) {\n    writeIndex = payload['MB_LogSTR_Buffer_TX.WRindex'];\n    readIndexSeqId = payload['MB_LogSTR_Buffer_TX.RDindex'];\n} else if (payload['MB_LogSTR_Buffer_TX'] && typeof payload['MB_LogSTR_Buffer_TX'] === 'object') {\n    writeIndex = payload['MB_LogSTR_Buffer_TX'].WRindex;\n    readIndexSeqId = payload['MB_LogSTR_Buffer_TX'].RDindex;\n}\n\nflow.set('stringLogBufferSnapshot', {\n    buffer, writeIndex, readIndexSeqId, snapshotTime: Date.now()\n});\nnode.status({ fill: 'green', shape: 'dot', text: `WRindex=${writeIndex} RDindex(SeqID)=${readIndexSeqId}` });\nreturn null;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 680,
-        "y": 620,
+        "x": 640,
+        "y": 680,
         "wires": [
             []
         ]
     },
     {
-        "id": "e105f781a808aa89",
+        "id": "810e519fb977758f",
         "type": "inject",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "name": "Select TagID from TagTableMapping",
         "props": [
             {
@@ -14636,18 +16035,19 @@
         "topic": "",
         "payload": "",
         "payloadType": "date",
-        "x": 310,
-        "y": 460,
+        "x": 270,
+        "y": 520,
         "wires": [
             [
-                "6e50c16394d0630d"
+                "45edf1ee5a68549e"
             ]
         ]
     },
     {
-        "id": "6e50c16394d0630d",
+        "id": "45edf1ee5a68549e",
         "type": "function",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "name": "Select TagID List",
         "func": "msg.topic = \"SELECT tagID, tagDomain FROM siroflex.tagtablemapping\";\nreturn msg;",
         "outputs": 1,
@@ -14656,32 +16056,34 @@
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 630,
-        "y": 460,
+        "x": 590,
+        "y": 520,
         "wires": [
             [
-                "37cb9433a15dadc6"
+                "9989df7f7e21e86e"
             ]
         ]
     },
     {
-        "id": "37cb9433a15dadc6",
+        "id": "9989df7f7e21e86e",
         "type": "mysql",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "mydb": "3ad98402733282af",
         "name": "MySQL – Show TagID, TagDomain",
-        "x": 1000,
-        "y": 460,
+        "x": 960,
+        "y": 520,
         "wires": [
             [
-                "c4c814681b820ee6"
+                "20799d0df92a089f"
             ]
         ]
     },
     {
-        "id": "c4c814681b820ee6",
+        "id": "20799d0df92a089f",
         "type": "change",
         "z": "2a81416e0ebc91b9",
+        "g": "905db611a408d18f",
         "name": "Store → flow.tagId",
         "rules": [
             {
@@ -14697,219 +16099,193 @@
         "from": "",
         "to": "",
         "reg": false,
-        "x": 1310,
-        "y": 460,
+        "x": 1270,
+        "y": 520,
         "wires": [
             []
         ]
     },
     {
-        "id": "68883bcee91ec246",
+        "id": "7c42c1cb0a374b03",
+        "type": "inject",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "Initialized Buffer Size",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "",
+        "crontab": "",
+        "once": true,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 960,
+        "y": 100,
+        "wires": [
+            [
+                "203a03da892f0e1b"
+            ]
+        ]
+    },
+    {
+        "id": "203a03da892f0e1b",
         "type": "function",
         "z": "2a81416e0ebc91b9",
-        "name": "Build Insert Data from Numeric Snapshot",
-        "func": "const BUFFER_SIZE = 200;\nconst NUM_DOMAIN = 1;\n\ntry {\n  const snapshot = flow.get('numericLogBufferSnapshot');\n  if (!snapshot || !Array.isArray(snapshot.buffer)) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'waiting for first read' });\n    return null;\n  }\n  if (Date.now() - snapshot.snapshotTime > 15000) {\n    node.status({ fill: 'red', shape: 'ring', text: 'snapshot is stale' });\n    return null;\n  }\n\n  const tagCache = flow.get('tagId') || [];\n  const validTagIds = new Set(\n    tagCache.filter(t => Number(t.tagDomain) === NUM_DOMAIN).map(t => t.tagID)\n  );\n\n  let readIndexSeqId = Number(snapshot.readIndexSeqId);\n  const writeIndex = Number(snapshot.writeIndex);\n  const writeSlot = Number.isFinite(writeIndex)\n    ? ((writeIndex % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE\n    : -1;\n\n  function microsToMillis(raw) {\n    if (raw === null || raw === undefined) return null;\n    try {\n      if (typeof raw !== 'object') return Number(BigInt(raw) / 1000n);\n      const low = raw.low ?? raw[0];\n      const high = raw.high ?? raw[1];\n      if (low !== undefined && high !== undefined) {\n        const big = (BigInt(high >>> 0) << 32n) | BigInt(low >>> 0);\n        return Number(big / 1000n);\n      }\n    } catch (e) { }\n    return null;\n  }\n\n  // Overrun detection with auto-resync\n  let maxBufferSeqId = readIndexSeqId;\n  let minBufferSeqId = Infinity;\n  for (const r of snapshot.buffer) {\n    if (r) {\n      const s = Number(r.SeqID);\n      if (Number.isFinite(s) && s > 0) {\n        if (s > maxBufferSeqId) maxBufferSeqId = s;\n        if (s < minBufferSeqId) minBufferSeqId = s;\n      }\n    }\n  }\n  const unreadCount = maxBufferSeqId - readIndexSeqId;\n  if (unreadCount > BUFFER_SIZE && Number.isFinite(minBufferSeqId)) {\n    // PLC has lapped us — records between readIndexSeqId+1 and minBufferSeqId-1\n    // are physically overwritten and unrecoverable. Force-resync forward.\n    const lost = unreadCount - BUFFER_SIZE;\n    const newRDindex = minBufferSeqId - 1;\n    node.error(`BUFFER OVERRUN: ${lost} record(s) permanently lost (seqIds ${readIndexSeqId + 1}–${newRDindex}). Auto-resyncing RDindex to ${newRDindex}.`);\n    readIndexSeqId = newRDindex;\n  }\n\n  const records = [];\n  const tornSeqIds = [];\n\n  for (let slot = 0; slot < BUFFER_SIZE; slot++) {\n    if (slot === writeSlot) continue;\n    const r = snapshot.buffer[slot];\n    if (!r) continue;\n\n    const seqId = Number(r.SeqID);\n    if (!(seqId > readIndexSeqId)) continue;\n\n    const tagId = Number(r.TagID);\n    const valueInt = Number(r.Value);\n    const valueReal = Number(r.Value_REAL);\n    const dataType = Number(r.DType);\n    const quality = Number(r.Quality);\n    const dateTimeMillis = microsToMillis(r.Time);\n\n    if (![tagId, valueInt, valueReal, dataType, quality].every(Number.isFinite) || dateTimeMillis === null) {\n      tornSeqIds.push(seqId);\n      //node.warn(`Torn read at slot ${slot}, seqId ${seqId} — deferring`);\n      continue;\n    }\n\n    const knownTag = validTagIds.has(tagId);\n    records.push({ seqId, tagId, valueInt, valueReal, dataType, dateTimeMillis, quality, knownTag });\n  }\n\n  if (records.length === 0) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'no new records' });\n    return null;\n  }\n\n  records.sort((a, b) => a.seqId - b.seqId);\n\n  const contiguous = [];\n  let expected = readIndexSeqId + 1;\n  for (const r of records) {\n    if (r.seqId !== expected) {\n      //node.warn(`Gap before seqId ${r.seqId} (expected ${expected}) — deferring rest of batch`);\n      break;\n    }\n    contiguous.push(r);\n    expected = r.seqId + 1;\n  }\n\n  const minTornSeqId = tornSeqIds.length > 0 ? Math.min(...tornSeqIds) : Infinity;\n  const commitBatch = contiguous.filter(r => r.seqId < minTornSeqId);\n\n  if (commitBatch.length === 0) {\n    const status = contiguous.length === 0\n      ? `waiting for seqId ${readIndexSeqId + 1}`\n      : 'all blocked by torn read';\n    node.status({ fill: 'yellow', shape: 'ring', text: status });\n    return null;\n  }\n\n  const maxCommittedSeqId = commitBatch[commitBatch.length - 1].seqId;\n  const knownRows = commitBatch.filter(r => r.knownTag);\n  const catchallRows = commitBatch.filter(r => !r.knownTag);\n\n  const buildInsert = (rows, table) => ({\n    topic: `INSERT IGNORE INTO ${table} (seq_id, tag_id, tag_datatype, tag_domain, value_int, value_real, value_string, date_time, quality) VALUES ${rows.map(() => '(?,?,?,?,?,?,?,?,?)').join(',')}`,\n    payload: rows.flatMap(r => [r.seqId, r.tagId, r.dataType, NUM_DOMAIN, r.valueInt, r.valueReal, null, r.dateTimeMillis, r.quality])\n  });\n\n  msg.maxCommittedSeqId = maxCommittedSeqId;\n  msg.recordCount = commitBatch.length;\n  msg.bufferType = 'numeric';\n  msg.knownInsert = knownRows.length > 0 ? buildInsert(knownRows, 'siroflex.log_records') : null;\n  msg.catchallInsert = catchallRows.length > 0 ? buildInsert(catchallRows, 'siroflex.tag_history_catchall') : null;\n\n  node.status({ fill: 'blue', shape: 'dot', text: `${knownRows.length} log / ${catchallRows.length} catchall, RD -> ${maxCommittedSeqId}` });\n  return msg;\n\n} catch (err) {\n  node.error('Numeric processing failed: ' + (err.message || err));\n  return null;\n}",
+        "g": "681514f16e6da48b",
+        "name": "function 9",
+        "func": "flow.set('BUFFER_SIZE', 300);\nreturn null;",
         "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 720,
-        "y": 800,
+        "x": 1180,
+        "y": 100,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "cdfcacb0065c2894",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "mydb": "3ad98402733282af",
+        "name": "Log Overrun Event",
+        "x": 1510,
+        "y": 1060,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "dc14af6ffe5bf1dc",
+        "type": "mysql",
+        "z": "2a81416e0ebc91b9",
+        "g": "5f0efb6852ce9a70",
+        "mydb": "3ad98402733282af",
+        "name": "Log Overrun Event",
+        "x": 1490,
+        "y": 1360,
+        "wires": [
+            []
+        ]
+    },
+    {
+        "id": "9b6dbc58d80ab285",
+        "type": "link in",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "AUTO: records inserted",
+        "links": [
+            "2ce5997e7010829e",
+            "85b99fda36f08353"
+        ],
+        "x": 175,
+        "y": 380,
         "wires": [
             [
-                "9e72825c65f97e37"
+                "4170fe26b30a0c5f"
             ]
         ]
     },
     {
-        "id": "9e72825c65f97e37",
+        "id": "4170fe26b30a0c5f",
+        "type": "trigger",
+        "z": "2a81416e0ebc91b9",
+        "g": "681514f16e6da48b",
+        "name": "Debounce 1s (settle)",
+        "op1": "",
+        "op2": "distribute",
+        "op1type": "nul",
+        "op2type": "str",
+        "duration": "30",
+        "extend": true,
+        "overrideDelay": false,
+        "units": "s",
+        "reset": "",
+        "bytopic": "all",
+        "topic": "topic",
+        "outputs": 1,
+        "x": 420,
+        "y": 380,
+        "wires": [
+            [
+                "07dd6f91ba406a5a"
+            ]
+        ]
+    },
+    {
+        "id": "07dd6f91ba406a5a",
         "type": "function",
         "z": "2a81416e0ebc91b9",
-        "name": "Route Numeric - Insert Query",
-        "func": "const msgs = [];\n\nif (msg.knownInsert) {\n    msgs.push({\n        topic: msg.knownInsert.topic,\n        payload: msg.knownInsert.payload,\n        maxCommittedSeqId: msg.maxCommittedSeqId,\n        recordCount: msg.recordCount,\n        bufferType: msg.bufferType,\n        _targetTable: 'log_records'\n    });\n}\n\nif (msg.catchallInsert) {\n    msgs.push({\n        topic: msg.catchallInsert.topic,\n        payload: msg.catchallInsert.payload,\n        maxCommittedSeqId: msg.maxCommittedSeqId,\n        recordCount: msg.recordCount,\n        bufferType: msg.bufferType,\n        _targetTable: 'catchall'\n    });\n}\n\nif (msgs.length === 0) return null;\n\nreturn [msgs[0], msgs.length > 1 ? msgs[1] : null];",
-        "outputs": 2,
+        "g": "681514f16e6da48b",
+        "name": "AUTO Distribute Gate",
+        "func": "// Gate logic:\n//   - HOA must be in AUTO (held level 2)\n//   - MANUAL chain must not be running (proc would just lock-fail, but skip\n//     the wasted MySQL round-trip)\n//   - auto_busy guards against overlapping fires; the proc's own GET_LOCK\n//     is the real serializer, this is just to avoid wasted connections.\n\nconst hoa = flow.get('hoa_current');\nif (hoa !== 2) {\n    node.status({ fill: 'grey', shape: 'ring', text: `idle (HOA=${hoa ?? '?'})` });\n    return null;\n}\nif (flow.get('hoa_manual_busy')) {\n    node.status({ fill: 'yellow', shape: 'ring', text: 'manual sync busy' });\n    return null;\n}\n\nconst since = flow.get('auto_busy_since') || 0;\nif (flow.get('auto_busy') && Date.now() - since > 60000) {\n    node.warn('auto_busy stuck >60s; clearing');\n    flow.set('auto_busy', false);\n}\nif (flow.get('auto_busy')) {\n    node.status({ fill: 'blue', shape: 'ring', text: 'distribute running' });\n    return null;\n}\n\nflow.set('auto_busy', true);\nflow.set('auto_busy_since', Date.now());\nmsg.topic = 'CALL siroflex.DistributeTagRecords()';\nmsg.payload = [];\nnode.status({ fill: 'green', shape: 'dot', text: 'distributing' });\nreturn msg;",
+        "outputs": 1,
         "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1120,
-        "y": 800,
+        "x": 660,
+        "y": 380,
         "wires": [
             [
-                "f77b522b90d30846"
-            ],
-            [
-                "94ab2ce6f5600dc0"
+                "ec92897434f8aaa7"
             ]
         ]
     },
     {
-        "id": "f77b522b90d30846",
-        "type": "mysql",
-        "z": "2a81416e0ebc91b9",
-        "mydb": "3ad98402733282af",
-        "name": "INSERT log_records (Numeric)",
-        "x": 1470,
-        "y": 720,
-        "wires": [
-            [
-                "60bbb6760204d8e5"
-            ]
-        ]
-    },
-    {
-        "id": "94ab2ce6f5600dc0",
-        "type": "mysql",
-        "z": "2a81416e0ebc91b9",
-        "mydb": "3ad98402733282af",
-        "name": "INSERT tag_history_catchall (Numeric)",
-        "x": 1500,
-        "y": 880,
-        "wires": [
-            [
-                "60bbb6760204d8e5"
-            ]
-        ]
-    },
-    {
-        "id": "60bbb6760204d8e5",
+        "id": "0b662debeb4d802e",
         "type": "function",
         "z": "2a81416e0ebc91b9",
-        "name": "Commit And Write Back Indices (Numeric)",
-        "func": "if (msg.error) {\n    node.warn('MySQL insert failed, numeric indices NOT advanced: ' + (msg.error.message || msg.error));\n    node.status({ fill: 'red', shape: 'ring', text: 'database error' });\n    // Still trigger string processor even if numeric failed\n    return [null, { payload: 'trigger' }];\n}\nnode.status({ fill: 'green', shape: 'dot', text: `committed ${msg.recordCount} (${msg._targetTable}), RDindex -> ${msg.maxCommittedSeqId}` });\nreturn [\n    { payload: msg.maxCommittedSeqId },\n    { payload: 'trigger' }\n];",
-        "outputs": 2,
-        "timeout": "",
+        "g": "681514f16e6da48b",
+        "name": "Clear AUTO Busy",
+        "func": "flow.set('auto_busy', false);\nnode.status({ fill: 'green', shape: 'dot', text: 'AUTO distribute complete' });\nreturn null;",
+        "outputs": 1,
+        "timeout": 0,
         "noerr": 0,
         "initialize": "",
         "finalize": "",
         "libs": [],
-        "x": 1870,
-        "y": 780,
+        "x": 1270,
+        "y": 380,
         "wires": [
-            [
-                "c60b0b084a337b80"
-            ],
-            [
-                "0bc445ae2eb8c152"
-            ]
+            []
         ]
     },
     {
-        "id": "c60b0b084a337b80",
-        "type": "eth-ip out",
+        "id": "2ce5997e7010829e",
+        "type": "link out",
         "z": "2a81416e0ebc91b9",
-        "endpoint": "1b55b1afbce46b8d",
-        "variable": "MB_LogNUM_Buffer_TX.RDindex",
-        "program": "",
-        "name": "Write Num Read Index To PLC",
-        "x": 2210,
-        "y": 780,
+        "g": "5f0efb6852ce9a70",
+        "name": "link out 8",
+        "mode": "link",
+        "links": [
+            "9b6dbc58d80ab285"
+        ],
+        "x": 2085,
+        "y": 940,
         "wires": []
     },
     {
-        "id": "0bc445ae2eb8c152",
-        "type": "function",
+        "id": "85b99fda36f08353",
+        "type": "link out",
         "z": "2a81416e0ebc91b9",
-        "name": "Build Insert Data from String Snapshot",
-        "func": "const BUFFER_SIZE = 200;\nconst STR_DOMAIN = 3;\n\ntry {\n  const snapshot = flow.get('stringLogBufferSnapshot');\n  if (!snapshot || !Array.isArray(snapshot.buffer)) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'waiting for first read' });\n    return null;\n  }\n  if (Date.now() - snapshot.snapshotTime > 15000) {\n    node.status({ fill: 'red', shape: 'ring', text: 'snapshot is stale' });\n    return null;\n  }\n\n  const tagCache = flow.get('tagId') || [];\n  const validTagIds = new Set(\n    tagCache.filter(t => Number(t.tagDomain) === STR_DOMAIN).map(t => t.tagID)\n  );\n\n  let readIndexSeqId = Number(snapshot.readIndexSeqId);\n  const writeIndex = Number(snapshot.writeIndex);\n  const writeSlot = Number.isFinite(writeIndex)\n    ? ((writeIndex % BUFFER_SIZE) + BUFFER_SIZE) % BUFFER_SIZE\n    : -1;\n\n  function microsToMillis(raw) {\n    if (raw === null || raw === undefined) return null;\n    try {\n      if (typeof raw !== 'object') return Number(BigInt(raw) / 1000n);\n      const low = raw.low ?? raw[0];\n      const high = raw.high ?? raw[1];\n      if (low !== undefined && high !== undefined) {\n        const big = (BigInt(high >>> 0) << 32n) | BigInt(low >>> 0);\n        return Number(big / 1000n);\n      }\n    } catch (e) { }\n    return null;\n  }\n\n  // Overrun detection with auto-resync\n  let maxBufferSeqId = readIndexSeqId;\n  let minBufferSeqId = Infinity;\n  for (const r of snapshot.buffer) {\n    if (r) {\n      const s = Number(r.SeqID);\n      if (Number.isFinite(s) && s > 0) {\n        if (s > maxBufferSeqId) maxBufferSeqId = s;\n        if (s < minBufferSeqId) minBufferSeqId = s;\n      }\n    }\n  }\n  const unreadCount = maxBufferSeqId - readIndexSeqId;\n  if (unreadCount > BUFFER_SIZE && Number.isFinite(minBufferSeqId)) {\n    const lost = unreadCount - BUFFER_SIZE;\n    const newRDindex = minBufferSeqId - 1;\n    node.error(`BUFFER OVERRUN: ${lost} record(s) permanently lost (seqIds ${readIndexSeqId + 1}–${newRDindex}). Auto-resyncing RDindex to ${newRDindex}.`);\n    readIndexSeqId = newRDindex;\n  }\n\n  const records = [];\n  const tornSeqIds = [];\n\n  for (let slot = 0; slot < BUFFER_SIZE; slot++) {\n    if (slot === writeSlot) continue;\n    const r = snapshot.buffer[slot];\n    if (!r) continue;\n\n    const seqId = Number(r.SeqID);\n    if (!(seqId > readIndexSeqId)) continue;\n\n    const tagId = Number(r.TagID);\n    const valueString = r.Value_STR ?? null;\n    const dataType = 5;\n    const quality = Number(r.Quality);\n    const dateTimeMillis = microsToMillis(r.DateTime);\n\n    if (![tagId, quality].every(Number.isFinite) || dateTimeMillis === null) {\n      tornSeqIds.push(seqId);\n      //node.warn(`Torn read at slot ${slot}, seqId ${seqId} — deferring`);\n      continue;\n    }\n\n    const knownTag = validTagIds.has(tagId);\n    records.push({ seqId, tagId, valueString, dataType, dateTimeMillis, quality, knownTag });\n  }\n\n  if (records.length === 0) {\n    node.status({ fill: 'grey', shape: 'ring', text: 'no new records' });\n    return null;\n  }\n\n  records.sort((a, b) => a.seqId - b.seqId);\n\n  const contiguous = [];\n  let expected = readIndexSeqId + 1;\n  for (const r of records) {\n    if (r.seqId !== expected) {\n      //node.warn(`Gap before seqId ${r.seqId} (expected ${expected}) — deferring rest of batch`);\n      break;\n    }\n    contiguous.push(r);\n    expected = r.seqId + 1;\n  }\n\n  const minTornSeqId = tornSeqIds.length > 0 ? Math.min(...tornSeqIds) : Infinity;\n  const commitBatch = contiguous.filter(r => r.seqId < minTornSeqId);\n\n  if (commitBatch.length === 0) {\n    const status = contiguous.length === 0\n      ? `waiting for seqId ${readIndexSeqId + 1}`\n      : 'all blocked by torn read';\n    node.status({ fill: 'yellow', shape: 'ring', text: status });\n    return null;\n  }\n\n  const maxCommittedSeqId = commitBatch[commitBatch.length - 1].seqId;\n  const knownRows = commitBatch.filter(r => r.knownTag);\n  const catchallRows = commitBatch.filter(r => !r.knownTag);\n\n  const buildInsert = (rows, table) => ({\n    topic: `INSERT IGNORE INTO ${table} (seq_id, tag_id, tag_datatype, tag_domain, value_int, value_real, value_string, date_time, quality) VALUES ${rows.map(() => '(?,?,?,?,?,?,?,?,?)').join(',')}`,\n    payload: rows.flatMap(r => [r.seqId, r.tagId, r.dataType, STR_DOMAIN, null, null, r.valueString, r.dateTimeMillis, r.quality])\n  });\n\n  msg.maxCommittedSeqId = maxCommittedSeqId;\n  msg.recordCount = commitBatch.length;\n  msg.bufferType = 'string';\n  msg.knownInsert = knownRows.length > 0 ? buildInsert(knownRows, 'siroflex.log_records') : null;\n  msg.catchallInsert = catchallRows.length > 0 ? buildInsert(catchallRows, 'siroflex.tag_history_catchall') : null;\n\n  node.status({ fill: 'blue', shape: 'dot', text: `${knownRows.length} log / ${catchallRows.length} catchall, RD -> ${maxCommittedSeqId}` });\n  return msg;\n\n} catch (err) {\n  node.error('String processing failed: ' + (err.message || err));\n  return null;\n}",
-        "outputs": 1,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 730,
-        "y": 1180,
-        "wires": [
-            [
-                "8645a7e45a8bb6eb"
-            ]
-        ]
-    },
-    {
-        "id": "8645a7e45a8bb6eb",
-        "type": "function",
-        "z": "2a81416e0ebc91b9",
-        "name": "Route String - Insert Query",
-        "func": "const msgs = [];\n\nif (msg.knownInsert) {\n    msgs.push({\n        topic: msg.knownInsert.topic,\n        payload: msg.knownInsert.payload,\n        maxCommittedSeqId: msg.maxCommittedSeqId,\n        recordCount: msg.recordCount,\n        bufferType: msg.bufferType,\n        _targetTable: 'log_records'\n    });\n}\n\nif (msg.catchallInsert) {\n    msgs.push({\n        topic: msg.catchallInsert.topic,\n        payload: msg.catchallInsert.payload,\n        maxCommittedSeqId: msg.maxCommittedSeqId,\n        recordCount: msg.recordCount,\n        bufferType: msg.bufferType,\n        _targetTable: 'catchall'\n    });\n}\n\nif (msgs.length === 0) return null;\n\nreturn [msgs[0], msgs.length > 1 ? msgs[1] : null];",
-        "outputs": 2,
-        "timeout": 0,
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1120,
-        "y": 1180,
-        "wires": [
-            [
-                "310f4f50aeb051dc"
-            ],
-            [
-                "5037f938d1e77d3e"
-            ]
-        ]
-    },
-    {
-        "id": "310f4f50aeb051dc",
-        "type": "mysql",
-        "z": "2a81416e0ebc91b9",
-        "mydb": "3ad98402733282af",
-        "name": "INSERT log_records (String)",
-        "x": 1480,
-        "y": 1100,
-        "wires": [
-            [
-                "16f2bf1960a7e4a0"
-            ]
-        ]
-    },
-    {
-        "id": "5037f938d1e77d3e",
-        "type": "mysql",
-        "z": "2a81416e0ebc91b9",
-        "mydb": "3ad98402733282af",
-        "name": "INSERT tag_history_catchall (String)",
-        "x": 1490,
-        "y": 1260,
-        "wires": [
-            [
-                "16f2bf1960a7e4a0"
-            ]
-        ]
-    },
-    {
-        "id": "16f2bf1960a7e4a0",
-        "type": "function",
-        "z": "2a81416e0ebc91b9",
-        "name": "Commit And Write Back Indices (String)",
-        "func": "if (msg.error) {\n    node.warn('MySQL insert failed, string indices NOT advanced: ' + (msg.error.message || msg.error));\n    node.status({ fill: 'red', shape: 'ring', text: 'database error' });\n    return null;\n}\nnode.status({ fill: 'green', shape: 'dot', text: `committed ${msg.recordCount} (${msg._targetTable}), RDindex -> ${msg.maxCommittedSeqId}` });\nreturn [{ payload: msg.maxCommittedSeqId }];",
-        "outputs": 1,
-        "timeout": "",
-        "noerr": 0,
-        "initialize": "",
-        "finalize": "",
-        "libs": [],
-        "x": 1870,
-        "y": 1160,
-        "wires": [
-            [
-                "c6a94406ec11b28b"
-            ]
-        ]
-    },
-    {
-        "id": "c6a94406ec11b28b",
-        "type": "eth-ip out",
-        "z": "2a81416e0ebc91b9",
-        "endpoint": "fa3e471856ceea92",
-        "variable": "MB_LogSTR_Buffer_TX.RDindex",
-        "program": "",
-        "name": "Write String Read Index To PLC",
-        "x": 2230,
-        "y": 1160,
+        "g": "5f0efb6852ce9a70",
+        "name": "link out 9",
+        "mode": "link",
+        "links": [
+            "9b6dbc58d80ab285"
+        ],
+        "x": 2095,
+        "y": 1280,
         "wires": []
     }
 ]
